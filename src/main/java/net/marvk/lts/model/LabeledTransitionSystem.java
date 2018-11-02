@@ -223,8 +223,6 @@ public class LabeledTransitionSystem {
             stringJoiner.add("]");
         }
 
-        stringJoiner.add("#");
-
         for (final Transition transition : transitions) {
             stringJoiner.add("edge [");
             stringJoiner.add("source " + stateIdMap.get(transition.getStartState()));

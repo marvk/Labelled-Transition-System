@@ -1,0 +1,5 @@
+switch(rel){
+    rel = (p -> pr);
+    pr = (r -> rel);
+    rel = (h -> rel);
+}
