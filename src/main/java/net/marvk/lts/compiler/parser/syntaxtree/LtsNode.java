@@ -8,7 +8,7 @@ import java.util.Set;
  *
  * @author Marvin Kuhnke
  */
-public class LtsNode implements Node {
+public class LtsNode extends Node {
     private final NameNode nameNode;
     private final Set<StateNode> initialStates;
     private final Set<AssignNode> assignNodes;
@@ -20,7 +20,7 @@ public class LtsNode implements Node {
     }
 
     @Override
-    public void accept(final TreeVisitor treeVisitor) {
+    void accept(final TreeVisitor<?> treeVisitor) {
         treeVisitor.accept(this, nameNode, initialStates, assignNodes);
     }
 }

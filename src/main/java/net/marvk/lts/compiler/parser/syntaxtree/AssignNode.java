@@ -5,7 +5,7 @@ package net.marvk.lts.compiler.parser.syntaxtree;
  *
  * @author Marvin Kuhnke
  */
-public class AssignNode implements Node {
+public class AssignNode extends Node {
     private final StateNode stateNode;
     private final TransitionNode transitionNode;
 
@@ -15,7 +15,7 @@ public class AssignNode implements Node {
     }
 
     @Override
-    public void accept(final TreeVisitor treeVisitor) {
+    void accept(final TreeVisitor<?> treeVisitor) {
         treeVisitor.accept(this, stateNode, transitionNode);
     }
 }

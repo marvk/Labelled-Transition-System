@@ -5,6 +5,6 @@ package net.marvk.lts.compiler.parser.syntaxtree;
  *
  * @author Marvin Kuhnke
  */
-public interface Node {
-    void accept(final TreeVisitor treeVisitor);
+public abstract class Node {
+    abstract void accept(final TreeVisitor<?> treeVisitor);
 }

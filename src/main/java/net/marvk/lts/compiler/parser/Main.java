@@ -1,7 +1,7 @@
 package net.marvk.lts.compiler.parser;
 
 import net.marvk.lts.compiler.parser.syntaxtree.LtsNode;
-import net.marvk.lts.compiler.parser.syntaxtree.PrintTreeVisitor;
+import net.marvk.lts.compiler.parser.syntaxtree.ToStringTreeVisitor;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,6 +26,8 @@ public final class Main {
 
         final LtsNode ltsNode = new Parser(input).parse();
 
-        ltsNode.accept(new PrintTreeVisitor());
+        final String result = new ToStringTreeVisitor(ltsNode).result();
+
+        System.out.println(result);
     }
 }

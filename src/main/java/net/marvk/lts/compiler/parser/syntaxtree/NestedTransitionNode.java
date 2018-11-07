@@ -5,7 +5,7 @@ package net.marvk.lts.compiler.parser.syntaxtree;
  *
  * @author Marvin Kuhnke
  */
-public class NestedTransitionNode implements TransitionNode {
+public class NestedTransitionNode extends TransitionNode {
 
     private final SymbolNode symbolNode;
     private final TransitionNode transitionNode;
@@ -16,7 +16,7 @@ public class NestedTransitionNode implements TransitionNode {
     }
 
     @Override
-    public void accept(final TreeVisitor treeVisitor) {
+    void accept(final TreeVisitor<?> treeVisitor) {
         treeVisitor.accept(this, symbolNode, transitionNode);
     }
 }

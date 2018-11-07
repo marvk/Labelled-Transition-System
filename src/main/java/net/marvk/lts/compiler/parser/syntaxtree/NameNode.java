@@ -5,7 +5,7 @@ package net.marvk.lts.compiler.parser.syntaxtree;
  *
  * @author Marvin Kuhnke
  */
-public class NameNode implements Node {
+public class NameNode extends Node {
     private final String name;
 
     public NameNode(final String name) {
@@ -13,7 +13,7 @@ public class NameNode implements Node {
     }
 
     @Override
-    public void accept(final TreeVisitor treeVisitor) {
+    void accept(final TreeVisitor<?> treeVisitor) {
         treeVisitor.accept(this, name);
     }
 }

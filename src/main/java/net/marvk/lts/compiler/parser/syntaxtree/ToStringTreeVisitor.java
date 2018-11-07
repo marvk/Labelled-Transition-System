@@ -1,17 +1,36 @@
 package net.marvk.lts.compiler.parser.syntaxtree;
 
 import java.util.Set;
+import java.util.StringJoiner;
 
 /**
  * Created on 2018-11-02.
  *
  * @author Marvin Kuhnke
  */
-public class PrintTreeVisitor extends TreeVisitor {
+public class ToStringTreeVisitor extends TreeVisitor<String> {
+    private final StringJoiner stringJoiner;
+    private final LtsNode ltsNode;
+    private String result;
+
     private int depth;
 
-    public PrintTreeVisitor() {
+    public ToStringTreeVisitor(final LtsNode ltsNode) {
+        super(ltsNode);
+
+        this.stringJoiner = new StringJoiner("\n");
         this.depth = 0;
+        this.ltsNode = ltsNode;
+    }
+
+    @Override
+    public synchronized String result() {
+        if (result == null) {
+            ltsNode.accept(this);
+            this.result = stringJoiner.toString();
+        }
+
+        return result;
     }
 
     @Override
@@ -76,10 +95,10 @@ public class PrintTreeVisitor extends TreeVisitor {
     }
 
     private void print(final Node node) {
-        System.out.println("-".repeat(depth) + node.getClass().getSimpleName());
+        stringJoiner.add("-".repeat(depth) + node.getClass().getSimpleName());
     }
 
     private void print(final String node) {
-        System.out.println("-".repeat(depth) + node);
+        stringJoiner.add("-".repeat(depth) + node);
     }
 }

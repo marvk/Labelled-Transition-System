@@ -7,7 +7,13 @@ import java.util.Set;
  *
  * @author Marvin Kuhnke
  */
-abstract class TreeVisitor {
+abstract class TreeVisitor<T> {
+    public TreeVisitor(final LtsNode ltsNode) {
+
+    }
+
+    public abstract T result();
+
     abstract void accept(final LtsNode node, final NameNode nameNode, final Set<StateNode> initialStates, final Set<AssignNode> assignNodes);
 
     abstract void accept(final NameNode node, final String name);

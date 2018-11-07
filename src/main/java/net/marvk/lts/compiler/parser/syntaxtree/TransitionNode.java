@@ -5,5 +5,5 @@ package net.marvk.lts.compiler.parser.syntaxtree;
  *
  * @author Marvin Kuhnke
  */
-public interface TransitionNode extends Node {
+public abstract class TransitionNode extends Node {
 }

@@ -9,6 +9,10 @@ public class Symbol {
         this.representation = Objects.requireNonNull(representation);
     }
 
+    public String getRepresentation() {
+        return representation;
+    }
+
     @Override
     public String toString() {
         return representation;

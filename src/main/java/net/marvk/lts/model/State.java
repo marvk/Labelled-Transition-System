@@ -9,7 +9,6 @@ public class State {
         this.representation = Objects.requireNonNull(representation);
     }
 
-
     public String getRepresentation() {
         return representation;
     }
