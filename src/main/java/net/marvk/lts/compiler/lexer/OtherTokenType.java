@@ -6,5 +6,16 @@ package net.marvk.lts.compiler.lexer;
  * @author Marvin Kuhnke
  */
 public enum OtherTokenType implements TokenType {
-    EOF;
+    EOF("end of file");
+
+    private final String lexeme;
+
+    OtherTokenType(final String lexeme) {
+        this.lexeme = lexeme;
+    }
+
+    @Override
+    public String lexeme() {
+        return lexeme;
+    }
 }

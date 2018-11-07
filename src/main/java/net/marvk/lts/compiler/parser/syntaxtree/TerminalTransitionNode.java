@@ -5,7 +5,7 @@ package net.marvk.lts.compiler.parser.syntaxtree;
  *
  * @author Marvin Kuhnke
  */
-public class TerminalTransitionNode implements Node {
+public class TerminalTransitionNode implements TransitionNode {
     private final SymbolNode symbolNode;
     private final StateNode stateNode;
 

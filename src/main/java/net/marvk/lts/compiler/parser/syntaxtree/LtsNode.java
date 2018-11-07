@@ -1,6 +1,6 @@
 package net.marvk.lts.compiler.parser.syntaxtree;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -11,16 +11,16 @@ import java.util.Set;
 public class LtsNode implements Node {
     private final NameNode nameNode;
     private final Set<StateNode> initialStates;
-    private final Set<TransitionNode> transitionNodes;
+    private final Set<AssignNode> assignNodes;
 
-    public LtsNode(final NameNode nameNode, final List<StateNode> initialStates, final List<TransitionNode> transitionNodes) {
+    public LtsNode(final NameNode nameNode, final Collection<StateNode> initialStates, final Collection<AssignNode> assignNodes) {
         this.nameNode = nameNode;
         this.initialStates = Set.copyOf(initialStates);
-        this.transitionNodes = Set.copyOf(transitionNodes);
+        this.assignNodes = Set.copyOf(assignNodes);
     }
 
     @Override
     public void accept(final TreeVisitor treeVisitor) {
-        treeVisitor.accept(this, nameNode, initialStates, transitionNodes);
+        treeVisitor.accept(this, nameNode, initialStates, assignNodes);
     }
 }

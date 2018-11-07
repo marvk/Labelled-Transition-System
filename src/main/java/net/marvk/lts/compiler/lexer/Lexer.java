@@ -1,10 +1,7 @@
 package net.marvk.lts.compiler.lexer;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -13,17 +10,18 @@ import java.util.stream.Stream;
  *
  * @author Marvin Kuhnke
  */
-public class Lexer {
+public final class Lexer {
     private final List<String> input;
     private final List<String> debugInput;
     private int line;
     private int linePos;
     private char currentChar;
 
+    private boolean reachedEndOfFile;
+
     private Lexer(final String input) {
         this.debugInput = input.lines().collect(Collectors.toList());
         this.input = debugInput.stream()
-                               .map(String::strip)
                                .map(s -> s.concat("\n"))
                                .collect(Collectors.toList());
 
@@ -32,6 +30,8 @@ public class Lexer {
         this.currentChar = input.isEmpty()
                 ? 0
                 : input.charAt(0);
+
+        this.reachedEndOfFile = false;
     }
 
     private void advance() {
@@ -54,6 +54,10 @@ public class Lexer {
     }
 
     private Token scan() {
+        if (reachedEndOfFile) {
+            return null;
+        }
+
         while (isCurrentCharNotZero()) {
             if (Character.isWhitespace(currentChar)) {
                 skipWhitespace();
@@ -73,24 +77,26 @@ public class Lexer {
                 advance();
 
                 if ('>' == currentChar) {
+                    final Token result = new Token(SymbolTokenType.ARROW, debugInfo());
                     advance();
-                    return new Token(SymbolTokenType.ARROW, debugInfo());
+                    return result;
                 }
             } else {
                 final SymbolTokenType symbolTokenType = SymbolTokenType.singleCharTokenType(currentChar);
 
                 if (symbolTokenType != null) {
+                    final Token result = new Token(symbolTokenType, debugInfo());
                     advance();
-                    return new Token(symbolTokenType, debugInfo());
+                    return result;
                 }
             }
 
             final Token result = new Token(LexemeTokenType.UNKNOWN, debugInfo(), Character.toString(currentChar));
-
             advance();
-
             return result;
         }
+
+        this.reachedEndOfFile = true;
 
         return new Token(OtherTokenType.EOF, debugInfo());
     }
@@ -121,11 +127,15 @@ public class Lexer {
             advance();
         } while (isCurrentCharNotZero() && (Character.isAlphabetic(currentChar) || Character.isDigit(currentChar)));
 
-        return new Token(LexemeTokenType.IDENTIFIER, debugInfo(), result.toString());
+        return new Token(LexemeTokenType.IDENTIFIER, debugInfo(result.toString()), result.toString());
+    }
+
+    private DebugInfo debugInfo(final String lexeme) {
+        return new DebugInfo(line, linePos - lexeme.length(), currentLineDebug());
     }
 
     private DebugInfo debugInfo() {
-        return new DebugInfo(line, linePos, currentLineDebug());
+        return debugInfo("");
     }
 
     private String currentLine() {
@@ -143,13 +153,6 @@ public class Lexer {
     public static Stream<Token> tokenize(final String s) {
         final Lexer lexer = new Lexer(s);
 
-        return Stream.iterate(lexer.scan(), token -> token.getType() != OtherTokenType.EOF, unused -> lexer.scan());
-    }
-
-    public static void main(final String[] args) throws IOException {
-        final Path path = Paths.get("src/main/resources/net/marvk/lts/compiler/test1.lts");
-
-        final String input = String.join("\n", Files.readAllLines(path));
-        Lexer.tokenize(input).forEach(System.out::println);
+        return Stream.iterate(lexer.scan(), Objects::nonNull, unused -> lexer.scan());
     }
 }

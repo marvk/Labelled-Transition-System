@@ -36,6 +36,10 @@ public class Token {
         return lexeme;
     }
 
+    public int getLength() {
+        return lexeme.length();
+    }
+
     public DebugInfo getDebugInfo() {
         return debugInfo;
     }

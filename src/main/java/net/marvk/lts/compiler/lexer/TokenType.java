@@ -6,4 +6,5 @@ package net.marvk.lts.compiler.lexer;
  * @author Marvin Kuhnke
  */
 public interface TokenType {
+    String lexeme();
 }

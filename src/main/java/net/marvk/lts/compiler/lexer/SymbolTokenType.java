@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
  * @author Marvin Kuhnke
  */
 public enum SymbolTokenType implements TokenType {
+    EQUALS("="),
     ARROW("->"),
     COMMA(","),
     SEMICOLON(";"),
@@ -41,5 +42,10 @@ public enum SymbolTokenType implements TokenType {
 
     public static SymbolTokenType singleCharTokenType(final char c) {
         return CHARACTER_TYPE_MAP.get(c);
+    }
+
+    @Override
+    public String lexeme() {
+        return lexeme;
     }
 }
