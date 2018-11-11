@@ -1,7 +1,15 @@
 package net.marvk.lts;
 
-import net.marvk.lts.model.*;
+import guru.nidi.graphviz.attribute.Color;
+import guru.nidi.graphviz.engine.Format;
+import guru.nidi.graphviz.engine.Graphviz;
+import guru.nidi.graphviz.model.MutableGraph;
+import net.marvk.lts.model.LabeledTransitionSystem;
+import net.marvk.lts.model.State;
+import net.marvk.lts.model.Symbol;
+import net.marvk.lts.model.Transition;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,18 +17,26 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+import static guru.nidi.graphviz.model.Factory.mutGraph;
+import static guru.nidi.graphviz.model.Factory.mutNode;
+
 public final class Main {
     private Main() {
         throw new AssertionError("No instances of class " + Main.class);
     }
 
     public static void main(String[] args) throws IOException {
+
+        System.out.println("Adding States...");
+
         final State off = new State("off");
+        System.out.println(off.toString());
         final State low = new State("low");
         final State high = new State("high");
         final State rel = new State("rel");
         final State pr = new State("pr");
 
+        System.out.println("Adding symbols...");
         final Symbol p = new Symbol("p");
         final Symbol h = new Symbol("h");
         final Symbol r = new Symbol("r");
@@ -44,5 +60,11 @@ public final class Main {
         Files.createDirectories(folder);
         final Path file = Paths.get("result" + LocalDateTime.now().toEpochSecond(ZoneOffset.UTC) + ".gml");
         Files.write(folder.resolve(file), labeledTransitionSystem.toGml().getBytes());
+        /*
+        * HERE Starts the graph vizualization
+        * */
+        MutableGraph g = mutGraph("lamp").setDirected(true).add(
+                mutNode("off").add(Color.RED).addLink(mutNode("b")));
+        Graphviz.fromGraph(g).width(200).render(Format.PNG).toFile(new File("example/lamp.png"));
     }
 }

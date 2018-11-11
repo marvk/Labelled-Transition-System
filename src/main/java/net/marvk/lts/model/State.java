@@ -16,7 +16,7 @@ public class State {
     @Override
     public String toString() {
         return "State{" +
-                "representation='" +  + '\'' +
+                "representation='" + representation + '\'' +
                 '}';
     }
 
