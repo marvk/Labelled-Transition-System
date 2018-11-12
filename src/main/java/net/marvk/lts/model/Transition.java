@@ -49,4 +49,5 @@ public class Transition {
         result = 31 * result + (symbol != null ? symbol.hashCode() : 0);
         return result;
     }
+
 }

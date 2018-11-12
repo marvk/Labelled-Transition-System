@@ -1,9 +1,18 @@
 package net.marvk.lts.model;
 
+import guru.nidi.graphviz.attribute.Color;
+import guru.nidi.graphviz.attribute.Label;
+import guru.nidi.graphviz.attribute.Shape;
+import guru.nidi.graphviz.model.Factory;
+import guru.nidi.graphviz.model.Graph;
+import guru.nidi.graphviz.model.Node;
+
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static guru.nidi.graphviz.model.Factory.node;
 
 public class LabeledTransitionSystem {
     /**
@@ -234,5 +243,23 @@ public class LabeledTransitionSystem {
         stringJoiner.add("]");
 
         return stringJoiner.toString();
+    }
+
+
+    public Graph generateGraph(String name){
+        Graph graph = Factory.graph(name).directed();
+        Set<Node> iStates = new HashSet<>();
+        for(State s: initialStates){
+            iStates.add(node(s.getRepresentation()).with(Label.of(s.getRepresentation()
+            ), Color.RED));
+        }
+
+        for (Transition t: transitions){
+            Node a = node(t.getStartState().getRepresentation()).with(Shape.CIRCLE);
+            Node b = node(t.getGoalState().getRepresentation()).with(Shape.CIRCLE);
+            graph.with();
+        }
+
+        return graph;
     }
 }

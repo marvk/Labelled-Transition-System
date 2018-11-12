@@ -54,9 +54,10 @@ public final class Main {
         final Path file = Paths.get("result" + LocalDateTime.now().toEpochSecond(ZoneOffset.UTC) + ".gml");
         Files.write(folder.resolve(file), labeledTransitionSystem.toGml().getBytes());
 
+
         /*
-        * HERE Starts the graph vizualization
-        * */
+         * HERE Starts the graph visualization
+         * */
 
         MutableGraph g = Factory.mutGraph("lamp").setDirected(true).add(
                 Factory.mutNode("off").add(Color.RED).addLink(Factory.mutNode("b"))
