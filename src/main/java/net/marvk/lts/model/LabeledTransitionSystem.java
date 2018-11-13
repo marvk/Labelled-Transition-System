@@ -3,16 +3,20 @@ package net.marvk.lts.model;
 import guru.nidi.graphviz.attribute.Color;
 import guru.nidi.graphviz.attribute.Label;
 import guru.nidi.graphviz.attribute.Shape;
+import guru.nidi.graphviz.attribute.Style;
 import guru.nidi.graphviz.model.Factory;
-import guru.nidi.graphviz.model.Graph;
-import guru.nidi.graphviz.model.Node;
+import guru.nidi.graphviz.model.MutableGraph;
+import guru.nidi.graphviz.model.MutableNode;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static guru.nidi.graphviz.model.Factory.node;
+import static guru.nidi.graphviz.model.Factory.mutGraph;
+import static guru.nidi.graphviz.model.Factory.to;
+
 
 public class LabeledTransitionSystem {
     /**
@@ -245,20 +249,22 @@ public class LabeledTransitionSystem {
         return stringJoiner.toString();
     }
 
+    public MutableGraph generateMutableGraph(String name){
+        final MutableGraph graph = mutGraph(name).setDirected(true);
+        graph.linkAttrs().add(Style.BOLD, Color.BLACK);
+        final Map<State, MutableNode> stateMutableNodeMap = states.stream()
+                .collect(Collectors.toMap(Function.identity(),
+                        state -> Factory.mutNode(state.getRepresentation()).add(Color.BLACK, Shape.CIRCLE, Label.of(state.getRepresentation()))));
 
-    public Graph generateGraph(String name){
-        Graph graph = Factory.graph(name).directed();
-        Set<Node> iStates = new HashSet<>();
-        for(State s: initialStates){
-            iStates.add(node(s.getRepresentation()).with(Label.of(s.getRepresentation()
-            ), Color.RED));
-        }
+        //Make all initial States Red
+        initialStates.forEach(state -> stateMutableNodeMap.get(state).add(Color.RED));
 
-        for (Transition t: transitions){
-            Node a = node(t.getStartState().getRepresentation()).with(Shape.CIRCLE);
-            Node b = node(t.getGoalState().getRepresentation()).with(Shape.CIRCLE);
-            graph.with();
+        for (final Transition t: transitions){
+            final MutableNode start = stateMutableNodeMap.get(t.getStartState());
+            final MutableNode goal = stateMutableNodeMap.get(t.getGoalState());
+            start.links().add(to(goal).with(Label.of(t.getSymbol().getRepresentation())));
         }
+        states.forEach(state -> graph.add(stateMutableNodeMap.get(state).asLinkSource()));
 
         return graph;
     }

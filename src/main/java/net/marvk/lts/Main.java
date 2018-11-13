@@ -1,9 +1,7 @@
 package net.marvk.lts;
 
-import guru.nidi.graphviz.attribute.Color;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
-import guru.nidi.graphviz.model.Factory;
 import guru.nidi.graphviz.model.MutableGraph;
 import net.marvk.lts.model.LabeledTransitionSystem;
 import net.marvk.lts.model.State;
@@ -59,10 +57,13 @@ public final class Main {
          * HERE Starts the graph visualization
          * */
 
-        MutableGraph g = Factory.mutGraph("lamp").setDirected(true).add(
+        /*MutableGraph g = Factory.mutGraph("lamp").setDirected(true).add(
                 Factory.mutNode("off").add(Color.RED).addLink(Factory.mutNode("b"))
-        );
+        );*/
 
-        Graphviz.fromGraph(g).width(200).render(Format.PNG).toFile(new File("example/lamp.png"));
+        MutableGraph l = lamp.generateMutableGraph("lamp");
+        MutableGraph b = button.generateMutableGraph("button");
+        Graphviz.fromGraph(l).width(700).render(Format.PNG).toFile(new File("example/lamp.png"));
+        Graphviz.fromGraph(b).width(700).render(Format.PNG).toFile(new File("example/button.png"));
     }
 }
