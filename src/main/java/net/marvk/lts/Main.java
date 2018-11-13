@@ -63,7 +63,9 @@ public final class Main {
 
         MutableGraph l = lamp.generateMutableGraph("lamp");
         MutableGraph b = button.generateMutableGraph("button");
+        MutableGraph parallelComp = labeledTransitionSystem.generateMutableGraph("parallel");
         Graphviz.fromGraph(l).width(700).render(Format.PNG).toFile(new File("example/lamp.png"));
         Graphviz.fromGraph(b).width(700).render(Format.PNG).toFile(new File("example/button.png"));
+        Graphviz.fromGraph(parallelComp).width(700).render(Format.PNG).toFile(new File("example/parallel.png"));
     }
 }
