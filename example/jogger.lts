@@ -1,0 +1,8 @@
+jogger(idle){
+    idle = (run -> jogging);
+    idle = (walk -> walking);
+    walk = (run -> jogging);
+    walk = (wait -> idle);
+    jogging = (wait -> idle);
+    jogging = (walk -> walking);
+}

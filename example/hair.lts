@@ -1,4 +1,0 @@
-hair(dry){
-	dry = (wash -> wet);
-	wet = (blowDry -> dry);
-}

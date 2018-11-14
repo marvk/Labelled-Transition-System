@@ -1,0 +1,4 @@
+converse(start){
+    start = (think -> thinking);
+    thinking = (talk -> talking);
+}
