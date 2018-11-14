@@ -1,0 +1,6 @@
+door(closed){
+	closed = (open->opened);
+	closed = (lock->locked);
+	opened = (close->closed);
+	locked = (unlock-> closed);
+}

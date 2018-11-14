@@ -1,0 +1,7 @@
+process(waiting){
+	waiting = (run -> running);
+	running = (wait -> waiting);
+	running = (block -> blocked);
+	running = (terminate -> terminated);
+	blocked = (wait -> waiting);
+}
