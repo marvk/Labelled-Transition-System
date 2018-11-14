@@ -1,0 +1,5 @@
+printer(idle){
+    idle = (reqB -> wait);
+    wait = (beginB -> print);
+    print = (endB -> idle);
+}
