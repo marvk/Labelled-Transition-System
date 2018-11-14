@@ -8,7 +8,7 @@ This application can parse a simple custom description language for labeled tran
         -h
         Prints this usage page
     FILES
-        -f file1 [file2 file3...]
+        -f file1 (file2 file3...)
         Specify input file(s), must be last argument
     COMPOSITE
         -c [name]
@@ -16,6 +16,12 @@ This application can parse a simple custom description language for labeled tran
     ALL
         -a
         If set, all input files will be output, not only the composite
+    SHOW UNREACHABLE STATES
+        -u
+        If set, renders unreachable states
+    ENGINE
+        -e [CIRCO|DOT|NEATO|OSAGE|TWOPI|FDP]
+        Set the Graphviz rendering engine
     OUTPUT
         -o file
         Set the output folder

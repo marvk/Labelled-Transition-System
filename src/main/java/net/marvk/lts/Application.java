@@ -27,6 +27,12 @@ public final class Application {
             "ALL\n" +
             "\t-a\n" +
             "\tIf set, all input files will be output, not only the composite\n" +
+            "SHOW UNREACHABLE STATES\n" +
+            "\t-u\n" +
+            "\tIf set, renders unreachable states\n" +
+            "ENGINE\n" +
+            "\t-e [CIRCO|DOT|NEATO|OSAGE|TWOPI|FDP]\n" +
+            "\tSet the Graphviz rendering engine\n" +
             "OUTPUT\n" +
             "\t-o file\n" +
             "\tSet the output folder\n\n" +
@@ -47,6 +53,7 @@ public final class Application {
         List<LabeledTransitionSystem> lts = null;
         boolean outputAll = false;
         boolean createComposite = false;
+        boolean showUnreachables = false;
         Path output = Paths.get("");
         String compositeName = null;
 
@@ -73,6 +80,9 @@ public final class Application {
                         compositeName = maybeName;
                     }
                     break;
+                case "-u":
+                    showUnreachables = true;
+                    break;
                 case "-a":
                     outputAll = true;
                     break;
@@ -97,7 +107,8 @@ public final class Application {
             }
 
             final LabeledTransitionSystem composite = lts.get(0)
-                                                         .parallelComposition(compositeName, lts.subList(1, lts.size()));
+                                                         .parallelComposition(compositeName, showUnreachables, lts.subList(1, lts
+                                                                 .size()));
 
             Util.renderLts(composite, output, engine);
         }

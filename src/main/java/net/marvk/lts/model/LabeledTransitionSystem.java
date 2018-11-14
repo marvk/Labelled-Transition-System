@@ -145,7 +145,7 @@ public class LabeledTransitionSystem {
                      .collect(Collectors.toSet());
     }
 
-    public LabeledTransitionSystem parallelComposition(final String name, final LabeledTransitionSystem other) {
+    public LabeledTransitionSystem parallelComposition(final String name, final boolean showUnreachables, final LabeledTransitionSystem other) {
         final Set<Symbol> h = intersection(this.alphabet, other.alphabet);
         final Set<Symbol> thisWithoutOther = relativeComplement(this.alphabet, other.alphabet);
         final Set<Symbol> otherWithoutThis = relativeComplement(other.alphabet, this.alphabet);
@@ -178,28 +178,45 @@ public class LabeledTransitionSystem {
         transitions.addAll(generateUnsynchronizedTransitions(thisWithoutOther, this.transitions, other.states, false));
         transitions.addAll(generateUnsynchronizedTransitions(otherWithoutThis, other.transitions, this.states, true));
 
-        final Set<State> states = reachableStates(initialStates, transitions);
+        if (!showUnreachables) {
+            final Set<State> reachableStates = reachableStates(initialStates, transitions);
 
-        // Remove unreachable transitions
-        transitions.removeIf(t -> !states.contains(t.getStartState()));
-        transitions.removeIf(t -> !states.contains(t.getGoalState()));
-
-        // Remove unreachable transitions
-        while (true) {
-            final boolean removal = states.removeIf(state -> hasIncomingTransition(state, transitions));
-
-            if (!removal) {
-                break;
-            }
-
-            transitions.removeIf(transition -> !states.contains(transition.getStartState()));
+            // Remove unreachable transitions
+            transitions.removeIf(t -> !reachableStates.contains(t.getStartState()));
+            transitions.removeIf(t -> !reachableStates.contains(t.getGoalState()));
         }
 
         return new LabeledTransitionSystem(name, initialStates, transitions);
     }
 
-    private static boolean hasIncomingTransition(final State state, final Collection<Transition> transitions) {
-        return transitions.stream().noneMatch(transition -> transition.getGoalState().equals(state));
+    public LabeledTransitionSystem parallelComposition(final boolean showUnreachables, final LabeledTransitionSystem other) {
+        return parallelComposition(defaultName(), showUnreachables, other);
+    }
+
+    public LabeledTransitionSystem parallelComposition(final String name, final boolean showUnreachables, final LabeledTransitionSystem... others) {
+        return parallelComposition(name, showUnreachables, Arrays.asList(others));
+    }
+
+    public LabeledTransitionSystem parallelComposition(final boolean showUnreachables, final LabeledTransitionSystem... others) {
+        return parallelComposition(defaultName(), showUnreachables, others);
+    }
+
+    public LabeledTransitionSystem parallelComposition(final String name, final boolean showUnreachables, final Collection<LabeledTransitionSystem> others) {
+        if (others.size() < 1) {
+            throw new IndexOutOfBoundsException("Can not create parallel composition with 0 transition systems");
+        }
+
+        LabeledTransitionSystem result = this;
+
+        for (final LabeledTransitionSystem other : others) {
+            result = result.parallelComposition(name, showUnreachables, other);
+        }
+
+        return result;
+    }
+
+    public LabeledTransitionSystem parallelComposition(final boolean showUnreachables, final Collection<LabeledTransitionSystem> others) {
+        return parallelComposition(defaultName(), showUnreachables, others);
     }
 
     private static Set<State> reachableStates(final Collection<State> initialStates, final Collection<Transition> transitions) {
@@ -229,36 +246,6 @@ public class LabeledTransitionSystem {
         }
 
         return visited;
-    }
-
-    public LabeledTransitionSystem parallelComposition(final LabeledTransitionSystem other) {
-        return parallelComposition(defaultName(), other);
-    }
-
-    public LabeledTransitionSystem parallelComposition(final String name, final LabeledTransitionSystem... others) {
-        return parallelComposition(name, Arrays.asList(others));
-    }
-
-    public LabeledTransitionSystem parallelComposition(final LabeledTransitionSystem... others) {
-        return parallelComposition(defaultName(), others);
-    }
-
-    public LabeledTransitionSystem parallelComposition(final String name, final Collection<LabeledTransitionSystem> others) {
-        if (others.size() < 1) {
-            throw new IndexOutOfBoundsException("Can not create parallel composition with 0 transition systems");
-        }
-
-        LabeledTransitionSystem result = this;
-
-        for (final LabeledTransitionSystem other : others) {
-            result = result.parallelComposition(name, other);
-        }
-
-        return result;
-    }
-
-    public LabeledTransitionSystem parallelComposition(final Collection<LabeledTransitionSystem> others) {
-        return parallelComposition(defaultName(), others);
     }
 
     private static String defaultName() {
