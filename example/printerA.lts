@@ -1,4 +1,4 @@
-printer(idle){
+printerA(idle){
     idle = (reqA -> wait);
     wait = (beginA -> print);
     print = (endA -> idle);
