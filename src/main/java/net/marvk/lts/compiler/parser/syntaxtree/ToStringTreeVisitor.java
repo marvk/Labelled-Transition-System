@@ -3,11 +3,6 @@ package net.marvk.lts.compiler.parser.syntaxtree;
 import java.util.Set;
 import java.util.StringJoiner;
 
-/**
- * Created on 2018-11-02.
- *
- * @author Marvin Kuhnke
- */
 public class ToStringTreeVisitor implements TreeVisitor<String> {
     private final StringJoiner stringJoiner;
     private final LtsNode ltsNode;

@@ -20,7 +20,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>net.marvk.lts.Main</mainClass>
+                            <mainClass>net.marvk.lts.Application</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

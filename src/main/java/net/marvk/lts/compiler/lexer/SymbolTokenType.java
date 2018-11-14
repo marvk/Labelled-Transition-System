@@ -5,11 +5,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/**
- * Created on 2018-11-02.
- *
- * @author Marvin Kuhnke
- */
 public enum SymbolTokenType implements TokenType {
     EQUALS("="),
     ARROW("->"),

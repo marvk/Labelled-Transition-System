@@ -20,12 +20,16 @@ public class Symbol {
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         final Symbol symbol = (Symbol) o;
 
-        return representation != null ? representation.equals(symbol.representation) : symbol.representation == null;
+        return Objects.equals(representation, symbol.representation);
     }
 
     @Override

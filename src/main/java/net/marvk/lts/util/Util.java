@@ -5,6 +5,7 @@ import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import net.marvk.lts.compiler.parser.ParseException;
 import net.marvk.lts.compiler.parser.Parser;
+import net.marvk.lts.compiler.parser.syntaxtree.LtsNode;
 import net.marvk.lts.compiler.parser.syntaxtree.LtsTreeVisitor;
 import net.marvk.lts.model.LabeledTransitionSystem;
 
@@ -12,11 +13,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-/**
- * Created on 2018-11-14.
- *
- * @author Marvin Kuhnke
- */
 public final class Util {
     private Util() {
         throw new AssertionError("No instances of utility class " + Util.class);
@@ -36,10 +32,8 @@ public final class Util {
     public static LabeledTransitionSystem parseLts(final Path path) throws ParseException, IOException {
         final String input = String.join("\n", Files.readAllLines(path));
 
-        final LabeledTransitionSystem result = new LtsTreeVisitor(new Parser(input).parse()).result();
+        final LtsNode tree = new Parser(input).parse();
 
-        System.out.println(result);
-
-        return result;
+        return new LtsTreeVisitor(tree).result();
     }
 }

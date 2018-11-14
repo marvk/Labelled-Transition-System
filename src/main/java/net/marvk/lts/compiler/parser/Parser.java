@@ -7,11 +7,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * Created on 2018-11-02.
- *
- * @author Marvin Kuhnke
- */
 public class Parser {
 
     private final Queue<Token> queue;

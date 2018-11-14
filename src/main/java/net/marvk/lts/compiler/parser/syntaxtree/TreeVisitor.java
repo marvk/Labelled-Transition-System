@@ -2,11 +2,6 @@ package net.marvk.lts.compiler.parser.syntaxtree;
 
 import java.util.Set;
 
-/**
- * Created on 2018-11-02.
- *
- * @author Marvin Kuhnke
- */
 interface TreeVisitor<T> {
     T result();
 

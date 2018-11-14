@@ -3,11 +3,6 @@ package net.marvk.lts.compiler.parser.syntaxtree;
 import java.util.Collection;
 import java.util.Set;
 
-/**
- * Created on 2018-11-02.
- *
- * @author Marvin Kuhnke
- */
 public class LtsNode extends Node {
     private final NameNode nameNode;
     private final Set<StateNode> initialStates;
