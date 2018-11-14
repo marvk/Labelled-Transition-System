@@ -16,7 +16,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-
 public class LabeledTransitionSystem {
     private final String name;
 
@@ -82,7 +81,6 @@ public class LabeledTransitionSystem {
         this(defaultName(), states, initialStates, alphabet, transitions);
     }
 
-
     public LabeledTransitionSystem(final String name, final Collection<State> initialStates, final Collection<Transition> transitions) {
         this(name, generateStates(initialStates, transitions), initialStates, generateAlphabet(transitions), transitions);
     }
@@ -115,7 +113,6 @@ public class LabeledTransitionSystem {
         this(defaultName(), initialState, Arrays.asList(transitions));
     }
 
-
     public String getName() {
         return name;
     }
@@ -147,7 +144,6 @@ public class LabeledTransitionSystem {
                            .flatMap(transition -> Stream.of(transition.getStartState(), transition.getGoalState())))
                      .collect(Collectors.toSet());
     }
-
 
     public LabeledTransitionSystem parallelComposition(final String name, final LabeledTransitionSystem other) {
         final Set<Symbol> h = intersection(this.alphabet, other.alphabet);
@@ -182,8 +178,31 @@ public class LabeledTransitionSystem {
         transitions.addAll(generateUnsynchronizedTransitions(thisWithoutOther, this.transitions, other.states, false));
         transitions.addAll(generateUnsynchronizedTransitions(otherWithoutThis, other.transitions, this.states, true));
 
-        final Set<State> states = generateStates(initialStates, transitions);
+        final Set<State> states = reachableStates(initialStates, transitions);
 
+        // Remove unreachable transitions
+        transitions.removeIf(t -> !states.contains(t.getStartState()));
+        transitions.removeIf(t -> !states.contains(t.getGoalState()));
+
+        // Remove unreachable transitions
+        while (true) {
+            final boolean removal = states.removeIf(state -> hasIncomingTransition(state, transitions));
+
+            if (!removal) {
+                break;
+            }
+
+            transitions.removeIf(transition -> !states.contains(transition.getStartState()));
+        }
+
+        return new LabeledTransitionSystem(name, initialStates, transitions);
+    }
+
+    private static boolean hasIncomingTransition(final State state, final Collection<Transition> transitions) {
+        return transitions.stream().noneMatch(transition -> transition.getGoalState().equals(state));
+    }
+
+    private static Set<State> reachableStates(final Collection<State> initialStates, final Collection<Transition> transitions) {
         final Set<State> visited = new HashSet<>();
 
         for (final State initialState : initialStates) {
@@ -198,10 +217,9 @@ public class LabeledTransitionSystem {
                 final State currentState = queue.pop();
                 visited.add(currentState);
 
-                final State finalCurrentState = currentState;
                 final List<State> children = transitions.stream()
                                                         .filter(transition -> transition.getStartState()
-                                                                                        .equals(finalCurrentState))
+                                                                                        .equals(currentState))
                                                         .map(Transition::getGoalState)
                                                         .filter(state -> !visited.contains(state))
                                                         .collect(Collectors.toList());
@@ -210,25 +228,7 @@ public class LabeledTransitionSystem {
             } while (!queue.isEmpty());
         }
 
-        states.retainAll(visited);
-        transitions.removeIf(t -> !visited.contains(t.getStartState()));
-        transitions.removeIf(t -> !visited.contains(t.getGoalState()));
-
-        // Remove unreachable transitions
-        while (true) {
-            final boolean removal = states.removeIf(
-                    // No incoming transitions
-                    state -> transitions.stream().noneMatch(transition -> transition.getGoalState().equals(state))
-            );
-
-            if (!removal) {
-                break;
-            }
-
-            transitions.removeIf(transition -> !states.contains(transition.getStartState()));
-        }
-
-        return new LabeledTransitionSystem(name, initialStates, transitions);
+        return visited;
     }
 
     public LabeledTransitionSystem parallelComposition(final LabeledTransitionSystem other) {

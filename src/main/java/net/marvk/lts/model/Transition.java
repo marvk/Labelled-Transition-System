@@ -32,14 +32,25 @@ public class Transition {
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
 
-        final Transition that = (Transition) o;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
-        if (startState != null ? !startState.equals(that.startState) : that.startState != null) return false;
-        if (goalState != null ? !goalState.equals(that.goalState) : that.goalState != null) return false;
-        return symbol != null ? symbol.equals(that.symbol) : that.symbol == null;
+        final Transition other = (Transition) o;
+
+        if (!Objects.equals(startState, other.startState)) {
+            return false;
+        }
+
+        if (!Objects.equals(goalState, other.goalState)) {
+            return false;
+        }
+
+        return Objects.equals(symbol, other.symbol);
     }
 
     @Override

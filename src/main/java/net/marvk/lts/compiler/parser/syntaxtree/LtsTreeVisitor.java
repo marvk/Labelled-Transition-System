@@ -10,11 +10,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * Created on 2018-11-14.
- *
- * @author Marvin Kuhnke
- */
 public class LtsTreeVisitor implements TreeVisitor<LabeledTransitionSystem> {
     private final LtsNode ltsNode;
     private LabeledTransitionSystem result;

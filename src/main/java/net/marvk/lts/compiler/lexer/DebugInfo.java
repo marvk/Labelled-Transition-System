@@ -1,10 +1,5 @@
 package net.marvk.lts.compiler.lexer;
 
-/**
- * Created on 2018-11-02.
- *
- * @author Marvin Kuhnke
- */
 public class DebugInfo {
     private final int line;
     private final int pos;

@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public final class Main {
+public final class Application {
 
     private static final String HELP_STRING = "HELP\n" +
             "\t-h\n" +
@@ -33,11 +33,11 @@ public final class Main {
             "Example:\n" +
             "\tjava lts.jar -c compo -a -o results -f switch.lts lamp.lts";
 
-    private Main() {
-        throw new AssertionError("No instances of class " + Main.class);
+    private Application() {
+        throw new AssertionError("No instances of class " + Application.class);
     }
 
-    public static void main(String[] args) throws IOException, ParseException {
+    public static void main(final String[] args) throws IOException, ParseException {
         if (args.length == 0) {
             printHelp();
             return;

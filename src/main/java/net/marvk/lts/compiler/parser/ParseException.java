@@ -8,11 +8,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Created on 2018-10-25.
- *
- * @author Marvin Kuhnke
- */
 public class ParseException extends Exception {
     public ParseException(final Token token, final TokenType... expected) {
         this(token, Arrays.asList(expected));
