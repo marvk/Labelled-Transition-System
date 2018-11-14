@@ -37,7 +37,7 @@ public final class Application {
             "\t-o file\n" +
             "\tSet the output folder\n\n" +
             "Example:\n" +
-            "\tjava lts.jar -c comp -a -o results -f switch.lts lamp.lts";
+            "\tjava -jar lts.jar -c comp -a -o results -f switch.lts lamp.lts";
 
     private Application() {
         throw new AssertionError("No instances of class " + Application.class);

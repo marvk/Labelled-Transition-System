@@ -28,7 +28,7 @@ This application can parse a simple custom description language for labeled tran
 
 ##Example
 
-    java lts.jar -c compo -a -o results -f switch.lts lamp.lts
+    java -jar lts.jar -c compo -a -o results -f switch.lts lamp.lts
     
 This will produce the following images from their respective .lts files and composite respectively:
 
