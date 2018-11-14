@@ -8,17 +8,18 @@ import guru.nidi.graphviz.model.Factory;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.model.MutableNode;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static guru.nidi.graphviz.model.Factory.mutGraph;
-import static guru.nidi.graphviz.model.Factory.to;
-
 
 public class LabeledTransitionSystem {
+    private final String name;
+
     /**
      * S
      */
@@ -39,10 +40,14 @@ public class LabeledTransitionSystem {
      */
     private final Set<Transition> transitions;
 
-    public LabeledTransitionSystem(final Collection<State> states,
+    public LabeledTransitionSystem(final String name,
+                                   final Collection<State> states,
                                    final Collection<State> initialStates,
                                    final Collection<Symbol> alphabet,
                                    final Collection<Transition> transitions) {
+        this.name = name == null || name.isEmpty()
+                ? defaultName()
+                : name;
         this.states = Set.copyOf(states);
         this.initialStates = Set.copyOf(initialStates);
 
@@ -70,20 +75,49 @@ public class LabeledTransitionSystem {
         }
     }
 
+    public LabeledTransitionSystem(final Collection<State> states,
+                                   final Collection<State> initialStates,
+                                   final Collection<Symbol> alphabet,
+                                   final Collection<Transition> transitions) {
+        this(defaultName(), states, initialStates, alphabet, transitions);
+    }
+
+
+    public LabeledTransitionSystem(final String name, final Collection<State> initialStates, final Collection<Transition> transitions) {
+        this(name, generateStates(initialStates, transitions), initialStates, generateAlphabet(transitions), transitions);
+    }
+
     public LabeledTransitionSystem(final Collection<State> initialStates, final Collection<Transition> transitions) {
-        this(generateStates(initialStates, transitions), initialStates, generateAlphabet(transitions), transitions);
+        this(defaultName(), initialStates, transitions);
+    }
+
+    public LabeledTransitionSystem(final String name, final Collection<State> initialStates, final Transition... transitions) {
+        this(name, initialStates, Arrays.asList(transitions));
     }
 
     public LabeledTransitionSystem(final Collection<State> initialStates, final Transition... transitions) {
-        this(initialStates, Arrays.asList(transitions));
+        this(defaultName(), initialStates, transitions);
+    }
+
+    public LabeledTransitionSystem(final String name, final State initialState, final Collection<Transition> transitions) {
+        this(name, Set.of(initialState), transitions);
     }
 
     public LabeledTransitionSystem(final State initialState, final Collection<Transition> transitions) {
-        this(Set.of(initialState), transitions);
+        this(defaultName(), initialState, transitions);
+    }
+
+    public LabeledTransitionSystem(final String name, final State initialState, final Transition... transitions) {
+        this(name, initialState, Arrays.asList(transitions));
     }
 
     public LabeledTransitionSystem(final State initialState, final Transition... transitions) {
-        this(initialState, Arrays.asList(transitions));
+        this(defaultName(), initialState, Arrays.asList(transitions));
+    }
+
+
+    public String getName() {
+        return name;
     }
 
     public Set<State> getStates() {
@@ -114,7 +148,8 @@ public class LabeledTransitionSystem {
                      .collect(Collectors.toSet());
     }
 
-    public LabeledTransitionSystem parallelComposition(final LabeledTransitionSystem other) {
+
+    public LabeledTransitionSystem parallelComposition(final String name, final LabeledTransitionSystem other) {
         final Set<Symbol> h = intersection(this.alphabet, other.alphabet);
         final Set<Symbol> thisWithoutOther = relativeComplement(this.alphabet, other.alphabet);
         final Set<Symbol> otherWithoutThis = relativeComplement(other.alphabet, this.alphabet);
@@ -149,6 +184,36 @@ public class LabeledTransitionSystem {
 
         final Set<State> states = generateStates(initialStates, transitions);
 
+        final Set<State> visited = new HashSet<>();
+
+        for (final State initialState : initialStates) {
+            if (visited.contains(initialState)) {
+                continue;
+            }
+
+            final LinkedList<State> queue = new LinkedList<>();
+            queue.add(initialState);
+
+            do {
+                final State currentState = queue.pop();
+                visited.add(currentState);
+
+                final State finalCurrentState = currentState;
+                final List<State> children = transitions.stream()
+                                                        .filter(transition -> transition.getStartState()
+                                                                                        .equals(finalCurrentState))
+                                                        .map(Transition::getGoalState)
+                                                        .filter(state -> !visited.contains(state))
+                                                        .collect(Collectors.toList());
+
+                queue.addAll(children);
+            } while (!queue.isEmpty());
+        }
+
+        states.retainAll(visited);
+        transitions.removeIf(t -> !visited.contains(t.getStartState()));
+        transitions.removeIf(t -> !visited.contains(t.getGoalState()));
+
         // Remove unreachable transitions
         while (true) {
             final boolean removal = states.removeIf(
@@ -163,7 +228,42 @@ public class LabeledTransitionSystem {
             transitions.removeIf(transition -> !states.contains(transition.getStartState()));
         }
 
-        return new LabeledTransitionSystem(initialStates, transitions);
+        return new LabeledTransitionSystem(name, initialStates, transitions);
+    }
+
+    public LabeledTransitionSystem parallelComposition(final LabeledTransitionSystem other) {
+        return parallelComposition(defaultName(), other);
+    }
+
+    public LabeledTransitionSystem parallelComposition(final String name, final LabeledTransitionSystem... others) {
+        return parallelComposition(name, Arrays.asList(others));
+    }
+
+    public LabeledTransitionSystem parallelComposition(final LabeledTransitionSystem... others) {
+        return parallelComposition(defaultName(), others);
+    }
+
+    public LabeledTransitionSystem parallelComposition(final String name, final Collection<LabeledTransitionSystem> others) {
+        if (others.size() < 1) {
+            throw new IndexOutOfBoundsException("Can not create parallel composition with 0 transition systems");
+        }
+
+        LabeledTransitionSystem result = this;
+
+        for (final LabeledTransitionSystem other : others) {
+            result = result.parallelComposition(name, other);
+        }
+
+        return result;
+    }
+
+    public LabeledTransitionSystem parallelComposition(final Collection<LabeledTransitionSystem> others) {
+        return parallelComposition(defaultName(), others);
+    }
+
+    private static String defaultName() {
+        return "LTS" + LocalDateTime.now()
+                                    .toEpochSecond(ZoneOffset.UTC);
     }
 
     private static Set<Transition> generateUnsynchronizedTransitions(
@@ -249,20 +349,24 @@ public class LabeledTransitionSystem {
         return stringJoiner.toString();
     }
 
-    public MutableGraph generateMutableGraph(String name){
-        final MutableGraph graph = mutGraph(name).setDirected(true);
+    public MutableGraph generateMutableGraph() {
+        final MutableGraph graph = Factory.mutGraph(name).setDirected(true);
         graph.linkAttrs().add(Style.BOLD, Color.BLACK);
-        final Map<State, MutableNode> stateMutableNodeMap = states.stream()
-                .collect(Collectors.toMap(Function.identity(),
-                        state -> Factory.mutNode(state.getRepresentation()).add(Color.BLACK, Shape.CIRCLE, Label.of(state.getRepresentation()))));
+        final Map<State, MutableNode> stateMutableNodeMap =
+                states.stream()
+                      .collect(Collectors.toMap(
+                              Function.identity(),
+                              state -> Factory.mutNode(state.getRepresentation())
+                                              .add(Color.BLACK, Shape.CIRCLE, Label.of(state.getRepresentation())))
+                      );
 
         //Make all initial States Red
         initialStates.forEach(state -> stateMutableNodeMap.get(state).add(Color.RED));
 
-        for (final Transition t: transitions){
+        for (final Transition t : transitions) {
             final MutableNode start = stateMutableNodeMap.get(t.getStartState());
             final MutableNode goal = stateMutableNodeMap.get(t.getGoalState());
-            start.links().add(to(goal).with(Label.of(t.getSymbol().getRepresentation())));
+            start.links().add(Factory.to(goal).with(Label.of(t.getSymbol().getRepresentation())));
         }
         states.forEach(state -> graph.add(stateMutableNodeMap.get(state).asLinkSource()));
 

@@ -1,0 +1,6 @@
+lamp(off){
+    off = (p -> low);
+    low = (p -> off);
+    low = (h -> high);
+    high = (p -> off);
+}

@@ -12,6 +12,10 @@ public class NameNode extends Node {
         this.name = name;
     }
 
+    public String getName() {
+        return name;
+    }
+
     @Override
     void accept(final TreeVisitor<?> treeVisitor) {
         treeVisitor.accept(this, name);

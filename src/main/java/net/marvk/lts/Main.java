@@ -1,71 +1,130 @@
 package net.marvk.lts;
 
-import guru.nidi.graphviz.engine.Format;
-import guru.nidi.graphviz.engine.Graphviz;
-import guru.nidi.graphviz.model.MutableGraph;
+import guru.nidi.graphviz.engine.Engine;
+import net.marvk.lts.compiler.parser.ParseException;
 import net.marvk.lts.model.LabeledTransitionSystem;
-import net.marvk.lts.model.State;
-import net.marvk.lts.model.Symbol;
-import net.marvk.lts.model.Transition;
+import net.marvk.lts.util.Util;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public final class Main {
+
+    private static final String HELP_STRING = "HELP\n" +
+            "\t-h\n" +
+            "\tPrint this help page\n" +
+            "FILES\n" +
+            "\t-f file1 [file2 file3...]\n" +
+            "\tSpecify input file(s), must be last argument\n" +
+            "COMPOSITE\n" +
+            "\t-c [name]\n" +
+            "\tIf set, a composite will be created from input files\n" +
+            "ALL\n" +
+            "\t-a\n" +
+            "\tIf set, all input files will be output, not only the composite\n" +
+            "OUTPUT\n" +
+            "\t-o file\n" +
+            "\tSet the output folder\n\n" +
+            "Example:\n" +
+            "\tjava lts.jar -c compo -a -o results -f switch.lts lamp.lts";
+
     private Main() {
         throw new AssertionError("No instances of class " + Main.class);
     }
 
-    public static void main(String[] args) throws IOException {
-        final State off = new State("off");
-        final State low = new State("low");
-        final State high = new State("high");
-        final State rel = new State("rel");
-        final State pr = new State("pr");
+    public static void main(String[] args) throws IOException, ParseException {
+        if (args.length == 0) {
+            printHelp();
+            return;
+        }
 
-        final Symbol p = new Symbol("p");
-        final Symbol h = new Symbol("h");
-        final Symbol r = new Symbol("r");
+        Engine engine = Engine.CIRCO;
+        List<LabeledTransitionSystem> lts = null;
+        boolean outputAll = false;
+        boolean createComposite = false;
+        Path output = Paths.get("");
+        String compositeName = null;
 
-        final LabeledTransitionSystem lamp = new LabeledTransitionSystem(off,
-                new Transition(off, p, low),
-                new Transition(low, p, off),
-                new Transition(low, h, high),
-                new Transition(high, p, off)
-        );
+        for (int i = 0; i < args.length; i++) {
+            final String arg = args[i];
+            switch (arg) {
+                case "-h":
+                    printHelp();
+                    return;
+                case "-f":
+                    lts = getLts(args, i);
+                    i = args.length;
+                    break;
+                case "-e":
+                    i++;
+                    final String arg1 = args[i];
+                    engine = Engine.valueOf(arg1);
+                    break;
+                case "-c":
+                    createComposite = true;
+                    final String maybeName = args[i + 1];
+                    if (!maybeName.startsWith("-")) {
+                        i++;
+                        compositeName = maybeName;
+                    }
+                    break;
+                case "-a":
+                    outputAll = true;
+                    break;
+                case "-o":
+                    i++;
+                    output = Paths.get(args[i]);
+                    break;
+                default:
+                    System.err.println("Error: Unrecognized argument " + arg);
+                    return;
+            }
+        }
 
-        final LabeledTransitionSystem button = new LabeledTransitionSystem(rel,
-                new Transition(rel, p, pr),
-                new Transition(pr, r, rel),
-                new Transition(rel, h, rel)
-        );
+        if (lts == null || lts.isEmpty()) {
+            System.err.println("Error: No input specified");
+            return;
+        }
 
-        final LabeledTransitionSystem labeledTransitionSystem = lamp.parallelComposition(button);
+        if (createComposite) {
+            if (lts.size() <= 1) {
+                System.err.println("Warning: Only one lts specified, ignoring composite instruction");
+            }
 
-        final Path folder = Paths.get("results");
-        Files.createDirectories(folder);
-        final Path file = Paths.get("result" + LocalDateTime.now().toEpochSecond(ZoneOffset.UTC) + ".gml");
-        Files.write(folder.resolve(file), labeledTransitionSystem.toGml().getBytes());
+            final LabeledTransitionSystem composite = lts.get(0)
+                                                         .parallelComposition(compositeName, lts.subList(1, lts.size()));
 
+            Util.renderLts(composite, output, engine);
+        }
 
-        /*
-         * HERE Starts the graph visualization
-         * */
+        if (lts.size() == 1 || outputAll) {
+            for (final LabeledTransitionSystem lt : lts) {
+                Util.renderLts(lt, output, engine);
+            }
+        }
+    }
 
-        /*MutableGraph g = Factory.mutGraph("lamp").setDirected(true).add(
-                Factory.mutNode("off").add(Color.RED).addLink(Factory.mutNode("b"))
-        );*/
+    private static List<LabeledTransitionSystem> getLts(final String[] args, final int i) throws IOException, ParseException {
+        final List<LabeledTransitionSystem> result = new ArrayList<>();
 
-        MutableGraph l = lamp.generateMutableGraph("lamp");
-        MutableGraph b = button.generateMutableGraph("button");
-        MutableGraph parallelComp = labeledTransitionSystem.generateMutableGraph("parallel");
-        Graphviz.fromGraph(l).width(700).render(Format.PNG).toFile(new File("example/lamp.png"));
-        Graphviz.fromGraph(b).width(700).render(Format.PNG).toFile(new File("example/button.png"));
-        Graphviz.fromGraph(parallelComp).width(700).render(Format.PNG).toFile(new File("example/parallel.png"));
+        final List<Path> collect = Arrays.stream(Arrays.copyOfRange(args, i + 1, args.length))
+                                         .map(s -> Paths.get(s))
+                                         .collect(Collectors.toList());
+
+        for (final Path path : collect) {
+
+            result.add(Util.parseLts(path));
+        }
+
+        return result;
+    }
+
+    private static void printHelp() {
+        System.out.println(HELP_STRING);
     }
 }

@@ -2,13 +2,13 @@ package net.marvk.lts.compiler.parser.syntaxtree;
 
 import java.util.Set;
 import java.util.StringJoiner;
-import java.lang.String;
+
 /**
  * Created on 2018-11-02.
  *
  * @author Marvin Kuhnke
  */
-public class ToStringTreeVisitor extends TreeVisitor<String> {
+public class ToStringTreeVisitor implements TreeVisitor<String> {
     private final StringJoiner stringJoiner;
     private final LtsNode ltsNode;
     private String result;
@@ -16,8 +16,6 @@ public class ToStringTreeVisitor extends TreeVisitor<String> {
     private int depth;
 
     public ToStringTreeVisitor(final LtsNode ltsNode) {
-        super(ltsNode);
-
         this.stringJoiner = new StringJoiner("\n");
         this.depth = 0;
         this.ltsNode = ltsNode;
@@ -34,7 +32,7 @@ public class ToStringTreeVisitor extends TreeVisitor<String> {
     }
 
     @Override
-    void accept(final LtsNode node, final NameNode nameNode, final Set<StateNode> initialStates, final Set<AssignNode> assignNodes) {
+    public void accept(final LtsNode node, final NameNode nameNode, final Set<StateNode> initialStates, final Set<AssignNode> assignNodes) {
         print(node);
         depth++;
         nameNode.accept(this);
@@ -44,7 +42,7 @@ public class ToStringTreeVisitor extends TreeVisitor<String> {
     }
 
     @Override
-    void accept(final NameNode node, final String name) {
+    public void accept(final NameNode node, final String name) {
         print(node);
         depth++;
         print(name);
@@ -52,7 +50,7 @@ public class ToStringTreeVisitor extends TreeVisitor<String> {
     }
 
     @Override
-    void accept(final StateNode node, final String name) {
+    public void accept(final StateNode node, final String name) {
         print(node);
         depth++;
         print(name);
@@ -60,7 +58,7 @@ public class ToStringTreeVisitor extends TreeVisitor<String> {
     }
 
     @Override
-    void accept(final SymbolNode node, final String name) {
+    public void accept(final SymbolNode node, final String name) {
         print(node);
         depth++;
         print(name);
@@ -68,7 +66,7 @@ public class ToStringTreeVisitor extends TreeVisitor<String> {
     }
 
     @Override
-    void accept(final AssignNode assignNode, final StateNode stateNode, final TransitionNode transitionNode) {
+    public void accept(final AssignNode assignNode, final StateNode stateNode, final TransitionNode transitionNode) {
         print(assignNode);
         depth++;
         stateNode.accept(this);
@@ -77,7 +75,7 @@ public class ToStringTreeVisitor extends TreeVisitor<String> {
     }
 
     @Override
-    void accept(final TerminalTransitionNode terminalTransitionNode, final SymbolNode symbolNode, final StateNode goalStateNode) {
+    public void accept(final TerminalTransitionNode terminalTransitionNode, final SymbolNode symbolNode, final StateNode goalStateNode) {
         print(terminalTransitionNode);
         depth++;
         symbolNode.accept(this);
@@ -86,7 +84,7 @@ public class ToStringTreeVisitor extends TreeVisitor<String> {
     }
 
     @Override
-    void accept(final NestedTransitionNode transitionNode, final SymbolNode symbolNode, final TransitionNode goalTransitionNode) {
+    public void accept(final NestedTransitionNode transitionNode, final SymbolNode symbolNode, final TransitionNode goalTransitionNode) {
         print(transitionNode);
         depth++;
         symbolNode.accept(this);

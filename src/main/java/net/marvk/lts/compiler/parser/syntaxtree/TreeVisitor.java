@@ -7,28 +7,24 @@ import java.util.Set;
  *
  * @author Marvin Kuhnke
  */
-abstract class TreeVisitor<T> {
-    public TreeVisitor(final LtsNode ltsNode) {
+interface TreeVisitor<T> {
+    T result();
 
-    }
+    void accept(final LtsNode node, final NameNode nameNode, final Set<StateNode> initialStates, final Set<AssignNode> assignNodes);
 
-    public abstract T result();
+    void accept(final NameNode node, final String name);
 
-    abstract void accept(final LtsNode node, final NameNode nameNode, final Set<StateNode> initialStates, final Set<AssignNode> assignNodes);
+    void accept(final StateNode node, final String name);
 
-    abstract void accept(final NameNode node, final String name);
+    void accept(final SymbolNode node, final String name);
 
-    abstract void accept(final StateNode node, final String name);
+    void accept(final AssignNode assignNode, final StateNode stateNode, final TransitionNode node);
 
-    abstract void accept(final SymbolNode node, final String name);
+    void accept(final TerminalTransitionNode terminalTransitionNode, final SymbolNode symbolNode, final StateNode stateNode);
 
-    abstract void accept(final AssignNode assignNode, final StateNode stateNode, final TransitionNode node);
+    void accept(final NestedTransitionNode transitionNode, final SymbolNode symbolNode, final TransitionNode terminalTransitionNode);
 
-    abstract void accept(final TerminalTransitionNode terminalTransitionNode, final SymbolNode symbolNode, final StateNode stateNode);
-
-    abstract void accept(final NestedTransitionNode transitionNode, final SymbolNode symbolNode, final TransitionNode terminalTransitionNode);
-
-    void accept(final Node node) {
+    default void accept(final Node node) {
         node.accept(this);
     }
 }
