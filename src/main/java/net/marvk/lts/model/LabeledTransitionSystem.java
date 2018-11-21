@@ -34,10 +34,15 @@ public class LabeledTransitionSystem {
      */
     private final Set<Symbol> alphabet;
 
+
+    private Set<AtomicProposition> atomicPropositions;
+
+    private HashMap<State, Set<AtomicProposition>> labelingAP;
     /**
      * T, T &sube; S &times; &Sigma; &times; S
      */
     private final Set<Transition> transitions;
+
 
     public LabeledTransitionSystem(final String name,
                                    final Collection<State> states,
@@ -49,6 +54,7 @@ public class LabeledTransitionSystem {
                 : name;
         this.states = Set.copyOf(states);
         this.initialStates = Set.copyOf(initialStates);
+
 
         for (final State initialState : this.initialStates) {
             if (!states.contains(initialState)) {
@@ -74,6 +80,18 @@ public class LabeledTransitionSystem {
         }
     }
 
+    public LabeledTransitionSystem(final String name,
+                                   final Collection<State> states,
+                                   final Collection<State> initialStates,
+                                   final Collection<Symbol> alphabet,
+                                   final Collection<AtomicProposition> atomicPropositions,
+                                   final HashMap<State, Set<AtomicProposition>> labelingAP,
+                                   final Collection<Transition> transitions) {
+        this(name, states, initialStates, alphabet, transitions);
+        this.labelingAP = labelingAP;
+        this.atomicPropositions = Set.copyOf(atomicPropositions);
+    }
+
     public LabeledTransitionSystem(final Collection<State> states,
                                    final Collection<State> initialStates,
                                    final Collection<Symbol> alphabet,
@@ -81,36 +99,117 @@ public class LabeledTransitionSystem {
         this(defaultName(), states, initialStates, alphabet, transitions);
     }
 
-    public LabeledTransitionSystem(final String name, final Collection<State> initialStates, final Collection<Transition> transitions) {
+    public LabeledTransitionSystem(final Collection<State> states,
+                                   final Collection<State> initialStates,
+                                   final Collection<Symbol> alphabet,
+                                   final Collection<AtomicProposition> atomicPropositions,
+                                   final HashMap<State, Set<AtomicProposition>> labelingAP,
+                                   final Collection<Transition> transitions) {
+        this(defaultName(), states, initialStates, alphabet, atomicPropositions, labelingAP, transitions);
+    }
+
+    public LabeledTransitionSystem(final String name,
+                                   final Collection<State> initialStates,
+                                   final Collection<Transition> transitions) {
         this(name, generateStates(initialStates, transitions), initialStates, generateAlphabet(transitions), transitions);
     }
 
-    public LabeledTransitionSystem(final Collection<State> initialStates, final Collection<Transition> transitions) {
+    public LabeledTransitionSystem(final String name,
+                                   final Collection<State> initialStates,
+                                   final Collection<AtomicProposition> atomicPropositions,
+                                   final HashMap<State, Set<AtomicProposition>> labelingAP,
+                                   final Collection<Transition> transitions) {
+        this(name, generateStates(initialStates, transitions), initialStates, generateAlphabet(transitions), atomicPropositions, labelingAP, transitions);
+    }
+
+    public LabeledTransitionSystem(final Collection<State> initialStates,
+                                   final Collection<Transition> transitions) {
         this(defaultName(), initialStates, transitions);
     }
 
-    public LabeledTransitionSystem(final String name, final Collection<State> initialStates, final Transition... transitions) {
+    public LabeledTransitionSystem(final Collection<State> initialStates,
+                                   final Collection<AtomicProposition> atomicPropositions,
+                                   final HashMap<State, Set<AtomicProposition>> labelingAP,
+                                   final Collection<Transition> transitions) {
+        this(defaultName(), initialStates, atomicPropositions, labelingAP, transitions);
+    }
+
+    public LabeledTransitionSystem(final String name,
+                                   final Collection<State> initialStates,
+                                   final Transition... transitions) {
         this(name, initialStates, Arrays.asList(transitions));
     }
 
-    public LabeledTransitionSystem(final Collection<State> initialStates, final Transition... transitions) {
+    public LabeledTransitionSystem(final String name,
+                                   final Collection<State> initialStates,
+                                   final Collection<AtomicProposition> atomicPropositions,
+                                   final HashMap<State, Set<AtomicProposition>> labelingAP,
+                                   final Transition... transitions) {
+        this(name, initialStates, atomicPropositions, labelingAP, Arrays.asList(transitions));
+    }
+
+    public LabeledTransitionSystem(final Collection<State> initialStates,
+                                   final Transition... transitions) {
         this(defaultName(), initialStates, transitions);
     }
 
-    public LabeledTransitionSystem(final String name, final State initialState, final Collection<Transition> transitions) {
+    public LabeledTransitionSystem(final Collection<State> initialStates,
+                                   final Collection<AtomicProposition> atomicPropositions,
+                                   final HashMap<State, Set<AtomicProposition>> labelingAP,
+                                   final Transition... transitions) {
+        this(defaultName(), initialStates, atomicPropositions, labelingAP, transitions);
+    }
+
+    public LabeledTransitionSystem(final String name,
+                                   final State initialState,
+                                   final Collection<Transition> transitions) {
         this(name, Set.of(initialState), transitions);
     }
 
-    public LabeledTransitionSystem(final State initialState, final Collection<Transition> transitions) {
+    public LabeledTransitionSystem(final String name,
+                                   final State initialState,
+                                   final Collection<AtomicProposition> atomicPropositions,
+                                   final HashMap<State, Set<AtomicProposition>> labelingAP,
+                                   final Collection<Transition> transitions) {
+        this(name, Set.of(initialState), atomicPropositions, labelingAP, transitions);
+    }
+
+    public LabeledTransitionSystem(final State initialState,
+                                   final Collection<Transition> transitions) {
         this(defaultName(), initialState, transitions);
     }
 
-    public LabeledTransitionSystem(final String name, final State initialState, final Transition... transitions) {
+    public LabeledTransitionSystem(final State initialState,
+                                   final Collection<AtomicProposition> atomicPropositions,
+                                   final HashMap<State, Set<AtomicProposition>> labelingAP,
+                                   final Collection<Transition> transitions) {
+        this(defaultName(), initialState, atomicPropositions, labelingAP, transitions);
+    }
+
+    public LabeledTransitionSystem(final String name,
+                                   final State initialState,
+                                   final Transition... transitions) {
         this(name, initialState, Arrays.asList(transitions));
     }
 
-    public LabeledTransitionSystem(final State initialState, final Transition... transitions) {
+    public LabeledTransitionSystem(final String name,
+                                   final State initialState,
+                                   final Collection<AtomicProposition> atomicPropositions,
+                                   final HashMap<State, Set<AtomicProposition>> labelingAP,
+                                   final Transition... transitions) {
+        this(name, initialState, atomicPropositions, labelingAP, Arrays.asList(transitions));
+    }
+
+    public LabeledTransitionSystem(final State initialState,
+                                   final Transition... transitions) {
         this(defaultName(), initialState, Arrays.asList(transitions));
+    }
+
+    public LabeledTransitionSystem(final State initialState,
+                                   final Collection<AtomicProposition> atomicPropositions,
+                                   final HashMap<State, Set<AtomicProposition>> labelingAP,
+                                   final Transition... transitions) {
+        this(defaultName(), initialState, atomicPropositions, labelingAP, Arrays.asList(transitions));
     }
 
     public String getName() {
@@ -141,8 +240,8 @@ public class LabeledTransitionSystem {
         return Stream.concat(
                 initialStates.stream(),
                 transitions.stream()
-                           .flatMap(transition -> Stream.of(transition.getStartState(), transition.getGoalState())))
-                     .collect(Collectors.toSet());
+                        .flatMap(transition -> Stream.of(transition.getStartState(), transition.getGoalState())))
+                .collect(Collectors.toSet());
     }
 
     public LabeledTransitionSystem parallelComposition(final String name, final boolean showUnreachables, final LabeledTransitionSystem other) {
@@ -175,6 +274,7 @@ public class LabeledTransitionSystem {
             }
         }
 
+
         transitions.addAll(generateUnsynchronizedTransitions(thisWithoutOther, this.transitions, other.states, false));
         transitions.addAll(generateUnsynchronizedTransitions(otherWithoutThis, other.transitions, this.states, true));
 
@@ -186,6 +286,25 @@ public class LabeledTransitionSystem {
             transitions.removeIf(t -> !reachableStates.contains(t.getGoalState()));
         }
 
+        if (this.atomicPropositions != null && !this.atomicPropositions.isEmpty()
+                && this.atomicPropositions != null && !this.atomicPropositions.isEmpty()) {
+            final Set<AtomicProposition> atomicPropositions = Set.copyOf(this.atomicPropositions);
+            atomicPropositions.addAll(other.atomicPropositions);
+
+            final HashMap<State, Set<AtomicProposition>> labelingAP = new HashMap<>();
+
+            /**
+             * Union of both labeling function by pairwise union of atomic proposition sets.
+             */
+            for (final State stateLTS1 : this.labelingAP.keySet()) {
+                for (final State stateLTS2 : other.labelingAP.keySet()) {
+                    Set<AtomicProposition> tempAPs = Set.copyOf(this.labelingAP.get(stateLTS1));
+                    tempAPs.addAll(other.labelingAP.get(stateLTS2));
+                    labelingAP.put(new CompositeState(stateLTS1, stateLTS2), tempAPs);
+                }
+            }
+            return  new LabeledTransitionSystem(name, initialStates, atomicPropositions, labelingAP);
+        }
         return new LabeledTransitionSystem(name, initialStates, transitions);
     }
 
@@ -235,11 +354,11 @@ public class LabeledTransitionSystem {
                 visited.add(currentState);
 
                 final List<State> children = transitions.stream()
-                                                        .filter(transition -> transition.getStartState()
-                                                                                        .equals(currentState))
-                                                        .map(Transition::getGoalState)
-                                                        .filter(state -> !visited.contains(state))
-                                                        .collect(Collectors.toList());
+                        .filter(transition -> transition.getStartState()
+                                .equals(currentState))
+                        .map(Transition::getGoalState)
+                        .filter(state -> !visited.contains(state))
+                        .collect(Collectors.toList());
 
                 queue.addAll(children);
             } while (!queue.isEmpty());
@@ -250,7 +369,7 @@ public class LabeledTransitionSystem {
 
     private static String defaultName() {
         return "LTS" + LocalDateTime.now()
-                                    .toEpochSecond(ZoneOffset.UTC);
+                .toEpochSecond(ZoneOffset.UTC);
     }
 
     private static Set<Transition> generateUnsynchronizedTransitions(
@@ -300,6 +419,8 @@ public class LabeledTransitionSystem {
         return "LabeledTransitionSystem{" +
                 "initialStates=" + initialStates +
                 ", transitions=" + transitions +
+                ", atomicPropositions=" + atomicPropositions +
+                ", labeling: " + labelingAP +
                 '}';
     }
 
@@ -341,11 +462,11 @@ public class LabeledTransitionSystem {
         graph.linkAttrs().add(Style.BOLD, Color.BLACK);
         final Map<State, MutableNode> stateMutableNodeMap =
                 states.stream()
-                      .collect(Collectors.toMap(
-                              Function.identity(),
-                              state -> Factory.mutNode(state.getRepresentation())
-                                              .add(Color.BLACK, Shape.CIRCLE, Label.of(state.getRepresentation())))
-                      );
+                        .collect(Collectors.toMap(
+                                Function.identity(),
+                                state -> Factory.mutNode(state.getRepresentation())
+                                        .add(Color.BLACK, Shape.CIRCLE, Label.of(state.getRepresentation())))
+                        );
 
         //Make all initial States Red
         initialStates.forEach(state -> stateMutableNodeMap.get(state).add(Color.RED));

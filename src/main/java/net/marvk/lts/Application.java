@@ -2,15 +2,13 @@ package net.marvk.lts;
 
 import guru.nidi.graphviz.engine.Engine;
 import net.marvk.lts.compiler.parser.ParseException;
-import net.marvk.lts.model.LabeledTransitionSystem;
+import net.marvk.lts.model.*;
 import net.marvk.lts.util.Util;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public final class Application {
