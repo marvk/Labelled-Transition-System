@@ -287,7 +287,7 @@ public class LabeledTransitionSystem {
         }
 
         if (this.atomicPropositions != null && !this.atomicPropositions.isEmpty()
-                && this.atomicPropositions != null && !this.atomicPropositions.isEmpty()) {
+                && other.atomicPropositions != null && !other.atomicPropositions.isEmpty()) {
             final Set<AtomicProposition> atomicPropositions = Set.copyOf(this.atomicPropositions);
             atomicPropositions.addAll(other.atomicPropositions);
 
