@@ -45,15 +45,13 @@ public class KripkeStructure {
         this.initialStates = Set.copyOf(initialStates);
         this.transitionRelation = Set.copyOf(transitionRelation);
 
-        for(final State s: this.states){
-            for(KSTransition t: transitionRelation){
-                if (t.getStartState() == s){
-                    continue;
-                }else
+        /*for(final State s: this.states){
+            for(final KSTransition t: transitionRelation){
+                if (t.getStartState() != s)
                     throw new IllegalArgumentException("There exists no outgoing transition " +
-                            "for State " + s.toString() + "! This relation IS NOT left-total.");
+                            "for State " + s + "! This relation IS NOT left-total.");
             }
-        }
+        }*/
 
         for (final State initialState: this.initialStates){
             if (!states.contains(initialState)){
@@ -73,11 +71,8 @@ public class KripkeStructure {
         }
         this.labelingFunction = labelingFunction;
         for(final State s: this.states){
-            if (!labelingFunction.containsKey(s)){
-                throw new IllegalArgumentException("There is no entry for state " +  s);
-            }
-            if (labelingFunction.get(s).isEmpty() || labelingFunction.get(s) == null){
-                throw new IllegalArgumentException("There is no Set of true atomic proposition for state " + s);
+            if (!labelingFunction.containsKey(s)) {
+                throw new IllegalArgumentException("There is no entry for state " + s);
             }
         }
     }
@@ -110,18 +105,34 @@ public class KripkeStructure {
     /**
      * Checks if the Transition relation is left-total.
      * */
-    public boolean checkLeftTotality(final Set<KSTransition> ksTransition){
+    public boolean checkLeftTotality(){
         for(final State s: this.states){
-            for(KSTransition t: ksTransition){
-                if (t.getStartState() == s){
-                    continue;
-                }else
-                    System.out.println("There is no transition from " + s +
-                            " to another state from States.\nThis transition relation IS NOT left-total!");
-                    return false;
+            if (transitionRelContainsStartState(s)){
+                continue;
+            }else{
+                System.out.println("There is no transition from " + s +
+                        " to another state from States.\nThis transition relation IS NOT left-total!");
+                return false;
             }
         }
         return true;
+    }
+
+    private boolean transitionRelContainsStartState(final State state){
+        for (final KSTransition t: transitionRelation){
+            if (t.getStartState().equals(state))
+                return true;
+        }
+        return false;
+    }
+
+    private boolean transitionRelContainsGoalState(final State state){
+        for (final KSTransition t: transitionRelation){
+            if (t.getGoalState().equals(state)){
+                return true;
+            }
+        }
+        return false;
     }
 
     private static String defaultName() {

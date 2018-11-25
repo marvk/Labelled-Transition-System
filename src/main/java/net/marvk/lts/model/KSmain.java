@@ -35,12 +35,6 @@ public class KSmain {
                 new Transition(rel, h, rel)
         );
 
-        Set<KSTransition> ksTransitions = new HashSet<KSTransition>();
-        ksTransitions.add(new KSTransition(off, low));
-        ksTransitions.add(new KSTransition(low, off));
-        ksTransitions.add(new KSTransition(low, high));
-        ksTransitions.add(new KSTransition(high, low));
-
         Set<State> states = new HashSet<>();
         states.add(off);
         states.add(low);
@@ -56,6 +50,13 @@ public class KSmain {
         apHigh.add(new AtomicProposition("highBattUse"));
 
 
+        Set<KSTransition> ksTransitions = new HashSet<KSTransition>();
+        ksTransitions.add(new KSTransition(off, low));
+        ksTransitions.add(new KSTransition(low, high));
+        ksTransitions.add(new KSTransition(low, off));
+        ksTransitions.add(new KSTransition(high, off));
+
+
         HashMap<State, Set<AtomicProposition>> labelingFunction = new HashMap<>();
         labelingFunction.put(off, new HashSet<AtomicProposition>());
         labelingFunction.put(low, Set.copyOf(apLow));
@@ -66,7 +67,7 @@ public class KSmain {
 
         System.out.println("-----Created KS----");
         lampKS.toString();
-        System.out.println(lampKS.checkLeftTotality(ksTransitions) ? "This transition relation is left-total"
+        System.out.println(lampKS.checkLeftTotality() ? "This transition relation is left-total"
                 : "This transition relation is not left-total");
 
     }
