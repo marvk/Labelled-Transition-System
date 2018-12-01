@@ -22,18 +22,7 @@ public class KSmain {
         final Symbol r = new Symbol("r");
 
 
-        final LabeledTransitionSystem lamp = new LabeledTransitionSystem(off,
-                new Transition(off, p, low),
-                new Transition(low, p, off),
-                new Transition(low, h, high),
-                new Transition(high, p, off)
-        );
 
-        final LabeledTransitionSystem button = new LabeledTransitionSystem(rel,
-                new Transition(rel, p, pr),
-                new Transition(pr, r, rel),
-                new Transition(rel, h, rel)
-        );
 
         Set<KSTransition> ksTransitions = new HashSet<KSTransition>();
         ksTransitions.add(new KSTransition(off, low));
@@ -49,6 +38,10 @@ public class KSmain {
         Set<State> initialStates = new HashSet<>();
         initialStates.add(off);
 
+        HashSet<AtomicProposition> apList = new HashSet<>();
+        apList.add(new AtomicProposition("lightOn"));
+        apList.add(new AtomicProposition("highBattUse"));
+
         Collection<AtomicProposition> apLow = new HashSet<>();
         apLow.add(new AtomicProposition("lightOn"));
         Collection<AtomicProposition> apHigh = new HashSet<>();
@@ -61,6 +54,18 @@ public class KSmain {
         labelingFunction.put(low, Set.copyOf(apLow));
         labelingFunction.put(high, Set.copyOf(apHigh));
 
+        final LabeledTransitionSystem lamp = new LabeledTransitionSystem(off, apList, labelingFunction,
+                new Transition(off, p, low),
+                new Transition(low, p, off),
+                new Transition(low, h, high),
+                new Transition(high, p, off)
+        );
+
+        final LabeledTransitionSystem button = new LabeledTransitionSystem(rel,
+                new Transition(rel, p, pr),
+                new Transition(pr, r, rel),
+                new Transition(rel, h, rel)
+        );
         final KripkeStructure lampKS = new KripkeStructure("lamp", states, initialStates,
                 ksTransitions, labelingFunction);
 
@@ -68,6 +73,9 @@ public class KSmain {
         lampKS.toString();
         System.out.println(lampKS.checkLeftTotality(ksTransitions) ? "This transition relation is left-total"
                 : "This transition relation is not left-total");
+
+        final KripkeStructure lampTKS = new KripkeStructure(lamp);
+        System.out.print(lampTKS.toString());
 
     }
 }

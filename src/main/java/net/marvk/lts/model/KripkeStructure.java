@@ -2,10 +2,7 @@ package net.marvk.lts.model;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class KripkeStructure {
 
@@ -75,13 +72,17 @@ public class KripkeStructure {
                         transition + " not in set of states.");
             }
         }
-        this.labelingFunction = labelingFunction;
+        this.labelingFunction = Objects.requireNonNull(labelingFunction);
         for (final State s : this.states) {
             if (!labelingFunction.containsKey(s)) {
                 throw new IllegalArgumentException("There is no entry for state " + s);
             }
 
         }
+    }
+
+    public KripkeStructure(LabeledTransitionSystem lts){
+        this(lts.getName(), lts.getStates(), lts.getInitialStates(), lts.getKSTransitions(), lts.getLabelingAP());
     }
 
     public String getName() {
