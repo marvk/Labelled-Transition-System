@@ -39,7 +39,7 @@ public class KSmain {
         ksTransitions.add(new KSTransition(off, low));
         ksTransitions.add(new KSTransition(low, off));
         ksTransitions.add(new KSTransition(low, high));
-        ksTransitions.add(new KSTransition(high, low));
+        ksTransitions.add(new KSTransition(high, off));
 
         Set<State> states = new HashSet<>();
         states.add(off);
