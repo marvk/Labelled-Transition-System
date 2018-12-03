@@ -24,8 +24,6 @@ public class KSmain {
         final Symbol r = new Symbol("r");
 
 
-
-
         Set<KSTransition> ksTransitions = new HashSet<>();
         ksTransitions.add(new KSTransition(off, low));
         ksTransitions.add(new KSTransition(low, off));
@@ -68,6 +66,7 @@ public class KSmain {
                 new Transition(pr, r, rel),
                 new Transition(rel, h, rel)
         );
+
         final KripkeStructure lampKS = new KripkeStructure("lamp", states, initialStates,
                 ksTransitions, labelingFunction);
 
