@@ -97,6 +97,10 @@ public class KripkeStructure {
         return this.initialStates;
     }
 
+    public HashMap<State, Set<AtomicProposition>> getLabelingFunction() {
+        return labelingFunction;
+    }
+
     public Set<KSTransition> getTransitionRelation() {
         return this.transitionRelation;
     }

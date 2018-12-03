@@ -1,5 +1,7 @@
 package net.marvk.lts.model;
 
+import net.marvk.lts.model.ctl.CTL;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,7 +26,7 @@ public class KSmain {
 
 
 
-        Set<KSTransition> ksTransitions = new HashSet<KSTransition>();
+        Set<KSTransition> ksTransitions = new HashSet<>();
         ksTransitions.add(new KSTransition(off, low));
         ksTransitions.add(new KSTransition(low, off));
         ksTransitions.add(new KSTransition(low, high));
@@ -50,7 +52,7 @@ public class KSmain {
 
 
         HashMap<State, Set<AtomicProposition>> labelingFunction = new HashMap<>();
-        labelingFunction.put(off, new HashSet<AtomicProposition>());
+        labelingFunction.put(off, new HashSet<>());
         labelingFunction.put(low, Set.copyOf(apLow));
         labelingFunction.put(high, Set.copyOf(apHigh));
 
@@ -70,12 +72,11 @@ public class KSmain {
                 ksTransitions, labelingFunction);
 
         System.out.println("-----Created KS----");
-        lampKS.toString();
         System.out.println(lampKS.checkLeftTotality(ksTransitions) ? "This transition relation is left-total"
                 : "This transition relation is not left-total");
 
-        final KripkeStructure lampTKS = new KripkeStructure(lamp);
-        System.out.print(lampTKS.toString());
+        CTL ctl1 = new CTL("lightOn∨E[EX lightOn U lightOn]");
+        System.out.print("expression " + ctl1.getFormula() + "is " + (ctl1.check(lamp) ? "true": false));
 
     }
 }

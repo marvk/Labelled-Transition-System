@@ -1,7 +1,6 @@
 package net.marvk.lts.model.ctl.ctlParser;
 
 import net.marvk.lts.model.ctl.ctlLexer.CTLLexemeTokenType;
-import net.marvk.lts.model.ctl.ctlLexer.CTLLexer;
 import net.marvk.lts.model.ctl.ctlLexer.CTLSymbolTokenType;
 import net.marvk.lts.model.ctl.ctlLexer.CTLToken;
 
@@ -18,54 +17,40 @@ public class CTLParser {
 
     private static CTLNode recursionParsing(CTLNode prevNode, List<CTLToken> tokenList) {
 
-        if (tokenList.isEmpty() && prevNode.getToken().getType() == CTLSymbolTokenType.E) {
+        if (tokenList.isEmpty() && prevNode.getToken().getType().equals( CTLSymbolTokenType.E)) {
             throw new IllegalArgumentException("CTL expression is illegal. Missing Expression after E Quantifier.");
-        }else if (tokenList.isEmpty()){
+        } else if (tokenList.isEmpty()) {
             return null;
         }
 
         List<Integer> orOperatorPos = findOperator(tokenList, CTLSymbolTokenType.OR);
-        if (!orOperatorPos.isEmpty()) {
-            CTLNode node = new CTLNode(tokenList.get(orOperatorPos.get(0)));
-
-            for (List<CTLToken> subList : splitByIndices(orOperatorPos, tokenList)) {
-                node.addChild(recursionParsing(node, subList));
-            }
-
-            return node;
-        }
+        CTLNode boolNode = processBoolOperator(tokenList, orOperatorPos);
+        if (boolNode != null) return boolNode;
         List<Integer> andOperatorPos = findOperator(tokenList, CTLSymbolTokenType.AND);
-        if (!andOperatorPos.isEmpty()) {
-            CTLNode node = new CTLNode(tokenList.get(andOperatorPos.get(0)));
+        boolNode = processBoolOperator(tokenList, andOperatorPos);
+        if (boolNode != null) return boolNode;
 
-            for (List<CTLToken> subList : splitByIndices(andOperatorPos, tokenList)) {
-                node.addChild(recursionParsing(node, subList));
-            }
-
-            return node;
-        }
-
-        if (prevNode!= null && prevNode.getToken().getType() == CTLSymbolTokenType.E){
-            if (tokenList.get(0).getType() == CTLSymbolTokenType.X || tokenList.get(0).getType() == CTLSymbolTokenType.G){
+        if (prevNode != null && prevNode.getToken().getType().equals(CTLSymbolTokenType.E)) {
+            if (tokenList.get(0).getType().equals(CTLSymbolTokenType.X) || tokenList.get(0).getType().equals(CTLSymbolTokenType.G)) {
                 CTLNode node = new CTLNode(tokenList.get(0));
                 node.addChild(recursionParsing(node, tokenList.subList(1, tokenList.size())));
                 return node;
-            }else if (tokenList.get(0).getType() == CTLSymbolTokenType.LEFT_BRACKET){
+            } else if (tokenList.get(0).getType().equals(CTLSymbolTokenType.LEFT_BRACKET)) {
 
-                if (getClosingBracketIndex(0, tokenList) != tokenList.size() - 1){
+                if (getClosingBracketIndex(0, tokenList) != tokenList.size() - 1) {
                     throw new IllegalArgumentException("CTL Expression is illegal. Closing bracket of U Quantifier expression in wrong position-");
                 }
                 List<CTLToken> tempTokenList = tokenList.subList(1, tokenList.size() - 1);
 
                 List<Integer> indices = findOperator(tempTokenList, CTLSymbolTokenType.U);
 
-                if(indices.isEmpty()){
+                if (indices.isEmpty()) {
                     throw new IllegalArgumentException("CTL Expression is illegal. U Quantifier expected.");
                 }
 
                 CTLNode node = new CTLNode(tempTokenList.get(indices.get(0)));
 
-                for (List<CTLToken> subList: splitByIndices(indices, tempTokenList)){
+                for (List<CTLToken> subList : splitByIndices(indices, tempTokenList)) {
                     node.addChild(recursionParsing(node, subList));
                 }
                 return node;
@@ -73,15 +58,18 @@ public class CTLParser {
             }
         }
 
-        if (tokenList.get(0).getType() == CTLLexemeTokenType.IDENTIFIER) {
+        if (tokenList.size() == 1 &&
+                (tokenList.get(0).getType().equals(CTLLexemeTokenType.IDENTIFIER) ||
+                        tokenList.get(0).getType().equals(CTLSymbolTokenType.ONE) ||
+                        tokenList.get(0).getType().equals(CTLSymbolTokenType.ZERO))) {
             return new CTLNode(tokenList.get(0));
-        } else if (tokenList.get(0).getType() == CTLSymbolTokenType.NOT) {
+        } else if (tokenList.get(0).getType().equals(CTLSymbolTokenType.NOT)) {
             CTLNode node = new CTLNode(tokenList.get(0));
             node.addChild(recursionParsing(node, tokenList.subList(1, tokenList.size())));
             return node;
-        } else if (tokenList.get(0).getType() == CTLSymbolTokenType.LEFT_BRACKET && prevNode.token.getType() != CTLSymbolTokenType.E) {
+        } else if (tokenList.get(0).getType().equals(CTLSymbolTokenType.LEFT_BRACKET) && (prevNode == null || !prevNode.token.getType().equals(CTLSymbolTokenType.E))) {
             return recursionParsing(prevNode, tokenList.subList(1, getClosingBracketIndex(0, tokenList)));
-        } else if (tokenList.get(0).getType() == CTLSymbolTokenType.E){
+        } else if (tokenList.get(0).getType().equals(CTLSymbolTokenType.E)) {
             CTLNode node = new CTLNode(tokenList.get(0));
             node.addChild(recursionParsing(node, tokenList.subList(1, tokenList.size())));
             return node;
@@ -89,6 +77,19 @@ public class CTLParser {
 
 
         throw new IllegalArgumentException("CTL Expression is illegal.");
+    }
+
+    private static CTLNode processBoolOperator(List<CTLToken> tokenList, List<Integer> andOperatorPos) {
+        if (!andOperatorPos.isEmpty()) {
+            CTLNode boolNode = new CTLNode(tokenList.get(andOperatorPos.get(0)));
+
+            for (List<CTLToken> subList : splitByIndices(andOperatorPos, tokenList)) {
+                boolNode.addChild(recursionParsing(boolNode, subList));
+            }
+
+            return boolNode;
+        }
+        return null;
     }
 
 
@@ -101,7 +102,7 @@ public class CTLParser {
 
         if (indices.size() > 1) {
             for (int i = 0; i < indices.size() - 1; i++) {
-                List<CTLToken> tempSubList = ctlTokens.subList(indices.get(i).intValue() + 1, indices.get(i + 1).intValue());
+                List<CTLToken> tempSubList = ctlTokens.subList(indices.get(i) + 1, indices.get(i + 1));
                 if (!tempSubList.isEmpty()) {
                     result.add(tempSubList);
                 }
@@ -119,12 +120,12 @@ public class CTLParser {
         List<Integer> result = new ArrayList<>();
         int i = 0;
         while (i < ctlTokens.size()) {
-            if (ctlTokens.get(i).getType() == operator) {
-                result.add(Integer.valueOf(i));
+            if (ctlTokens.get(i).getType().equals(operator)) {
+                result.add(i);
                 i++;
                 continue;
             }
-            if (ctlTokens.get(i).getType() == CTLSymbolTokenType.LEFT_BRACKET) {
+            if (ctlTokens.get(i).getType().equals(CTLSymbolTokenType.LEFT_BRACKET)) {
                 i = getClosingBracketIndex(i, ctlTokens);
                 i++;
                 continue;
@@ -139,12 +140,12 @@ public class CTLParser {
         int bracketLevel = 0;
 
         for (int i = currentPos + 1; i < ctlTokens.size(); i++) {
-            if (bracketLevel == 0 && ctlTokens.get(i).getType() == CTLSymbolTokenType.RIGHT_BRACKET) {
+            if (bracketLevel == 0 && ctlTokens.get(i).getType().equals( CTLSymbolTokenType.RIGHT_BRACKET)) {
                 return i;
-            } else if (ctlTokens.get(i).getType() == CTLSymbolTokenType.RIGHT_BRACKET) {
+            } else if (ctlTokens.get(i).getType().equals( CTLSymbolTokenType.RIGHT_BRACKET)) {
                 bracketLevel--;
             }
-            if (ctlTokens.get(i).getType() == CTLSymbolTokenType.LEFT_BRACKET) {
+            if (ctlTokens.get(i).getType().equals( CTLSymbolTokenType.LEFT_BRACKET)) {
                 bracketLevel++;
             }
         }
@@ -152,11 +153,4 @@ public class CTLParser {
         throw new IllegalArgumentException("Missing closing bracket in CTL expression");
     }
 
-
-    public static void main(final String[] args){
-        List<CTLToken> tokens = CTLLexer.tokenize("EX ¬highBattUse ∨E[lightOn U highBattUse]");
-
-        CTLNode rootNode = CTLParser.startParsing(tokens);
-        System.out.print(rootNode.toString());
-    }
 }

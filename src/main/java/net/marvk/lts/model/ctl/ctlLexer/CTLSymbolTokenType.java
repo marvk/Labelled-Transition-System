@@ -6,6 +6,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public enum CTLSymbolTokenType implements CTLTokenType {
+    ONE("1"),
+    ZERO("0"),
     E("E"),
     X("X"),
     G("G"),
