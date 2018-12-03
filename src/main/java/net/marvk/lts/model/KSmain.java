@@ -1,5 +1,7 @@
 package net.marvk.lts.model;
 
+import net.marvk.lts.model.ctl.CTL;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,7 +24,39 @@ public class KSmain {
         final Symbol r = new Symbol("r");
 
 
-        final LabeledTransitionSystem lamp = new LabeledTransitionSystem(off,
+
+
+        Set<KSTransition> ksTransitions = new HashSet<>();
+        ksTransitions.add(new KSTransition(off, low));
+        ksTransitions.add(new KSTransition(low, off));
+        ksTransitions.add(new KSTransition(low, high));
+        ksTransitions.add(new KSTransition(high, off));
+
+        Set<State> states = new HashSet<>();
+        states.add(off);
+        states.add(low);
+        states.add(high);
+
+        Set<State> initialStates = new HashSet<>();
+        initialStates.add(off);
+
+        HashSet<AtomicProposition> apList = new HashSet<>();
+        apList.add(new AtomicProposition("lightOn"));
+        apList.add(new AtomicProposition("highBattUse"));
+
+        Collection<AtomicProposition> apLow = new HashSet<>();
+        apLow.add(new AtomicProposition("lightOn"));
+        Collection<AtomicProposition> apHigh = new HashSet<>();
+        apHigh.add(new AtomicProposition("lightOn"));
+        apHigh.add(new AtomicProposition("highBattUse"));
+
+
+        HashMap<State, Set<AtomicProposition>> labelingFunction = new HashMap<>();
+        labelingFunction.put(off, new HashSet<>());
+        labelingFunction.put(low, Set.copyOf(apLow));
+        labelingFunction.put(high, Set.copyOf(apHigh));
+
+        final LabeledTransitionSystem lamp = new LabeledTransitionSystem(off, apList, labelingFunction,
                 new Transition(off, p, low),
                 new Transition(low, p, off),
                 new Transition(low, h, high),
@@ -34,41 +68,15 @@ public class KSmain {
                 new Transition(pr, r, rel),
                 new Transition(rel, h, rel)
         );
-
-        Set<State> states = new HashSet<>();
-        states.add(off);
-        states.add(low);
-        states.add(high);
-
-        Set<State> initialStates = new HashSet<>();
-        initialStates.add(off);
-
-        Collection<AtomicProposition> apLow = new HashSet<>();
-        apLow.add(new AtomicProposition("lightOn"));
-        Collection<AtomicProposition> apHigh = new HashSet<>();
-        apHigh.add(new AtomicProposition("lightOn"));
-        apHigh.add(new AtomicProposition("highBattUse"));
-
-
-        Set<KSTransition> ksTransitions = new HashSet<KSTransition>();
-        ksTransitions.add(new KSTransition(off, low));
-        ksTransitions.add(new KSTransition(low, high));
-        ksTransitions.add(new KSTransition(low, off));
-        ksTransitions.add(new KSTransition(high, off));
-
-
-        HashMap<State, Set<AtomicProposition>> labelingFunction = new HashMap<>();
-        labelingFunction.put(off, new HashSet<AtomicProposition>());
-        labelingFunction.put(low, Set.copyOf(apLow));
-        labelingFunction.put(high, Set.copyOf(apHigh));
-
         final KripkeStructure lampKS = new KripkeStructure("lamp", states, initialStates,
                 ksTransitions, labelingFunction);
 
         System.out.println("-----Created KS----");
-        lampKS.toString();
-        System.out.println(lampKS.checkLeftTotality() ? "This transition relation is left-total"
+        System.out.println(lampKS.checkLeftTotality(ksTransitions) ? "This transition relation is left-total"
                 : "This transition relation is not left-total");
+
+        CTL ctl1 = new CTL("lightOn∨E[EX lightOn U lightOn]");
+        System.out.print("expression " + ctl1.getFormula() + "is " + (ctl1.check(lamp) ? "true": false));
 
     }
 }

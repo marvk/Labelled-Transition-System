@@ -34,7 +34,6 @@ public class LabeledTransitionSystem {
      */
     private final Set<Symbol> alphabet;
 
-
     private Set<AtomicProposition> atomicPropositions;
 
     private HashMap<State, Set<AtomicProposition>> labelingAP;
@@ -226,6 +225,21 @@ public class LabeledTransitionSystem {
 
     public Set<Symbol> getAlphabet() {
         return alphabet;
+    }
+
+    public Set<AtomicProposition> getAtomicPropositions() {
+        return atomicPropositions;
+    }
+
+    public Set<KSTransition> getKSTransitions(){
+        HashSet<KSTransition> newKSTransitions = new HashSet<>();
+        for (final Transition ltsTransition : this.transitions) {
+            newKSTransitions.add(new KSTransition(ltsTransition.getStartState(), ltsTransition.getGoalState()));
+        }
+        return newKSTransitions;
+    }
+    public HashMap<State, Set<AtomicProposition>> getLabelingAP() {
+        return labelingAP;
     }
 
     public Set<Transition> getTransitions() {
