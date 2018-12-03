@@ -2,13 +2,16 @@ package net.marvk.lts;
 
 import guru.nidi.graphviz.engine.Engine;
 import net.marvk.lts.compiler.parser.ParseException;
-import net.marvk.lts.model.*;
+import net.marvk.lts.model.LabeledTransitionSystem;
+import net.marvk.lts.model.ctl.CTL;
 import net.marvk.lts.util.Util;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public final class Application {
@@ -28,6 +31,9 @@ public final class Application {
             "SHOW UNREACHABLE STATES\n" +
             "\t-u\n" +
             "\tIf set, renders unreachable states\n" +
+            "CHECK CTL FORMULA(S)\n" +
+            "\t-ctl\n" +
+            "\tIf set, checks the CTL formula(s)\n" +
             "ENGINE\n" +
             "\t-e [CIRCO|DOT|NEATO|OSAGE|TWOPI|FDP]\n" +
             "\tSet the Graphviz rendering engine\n" +
@@ -54,6 +60,7 @@ public final class Application {
         boolean showUnreachables = false;
         Path output = Paths.get("");
         String compositeName = null;
+        List<CTL> ctls = null;
 
         for (int i = 0; i < args.length; i++) {
             final String arg = args[i];
@@ -77,6 +84,10 @@ public final class Application {
                         i++;
                         compositeName = maybeName;
                     }
+                    break;
+                case "-ctl":
+                    ctls = getCtls(args, i);
+                    i = args.length;
                     break;
                 case "-u":
                     showUnreachables = true;
@@ -116,6 +127,28 @@ public final class Application {
                 Util.renderLts(lt, output, engine);
             }
         }
+
+        if (ctls != null){
+            String outputCTLCheck = "";
+            for (final CTL ctl: ctls){
+                outputCTLCheck += "CTL Formula " + ctl.getFormula() + " is for the LTS(s) named:\n";
+                for (final LabeledTransitionSystem lt: lts){
+                    outputCTLCheck += "\t-" + lt.getName() + " " + (ctl.check(lt) ? "TRUE" : "FALSE");
+                }
+            }
+            System.out.println(outputCTLCheck);
+        }
+
+    }
+
+    private static List<CTL> getCtls(String[] args, int i) throws IOException, ParseException {
+        final List<CTL> result = new ArrayList<>();
+        final List<String> collect = Arrays.stream(Arrays.copyOfRange(args, i + 1, args.length)).collect(Collectors.toList());
+
+        for (final String s : collect){
+            result.add(new CTL(s));
+        }
+        return result;
     }
 
     private static List<LabeledTransitionSystem> getLts(final String[] args, final int i) throws IOException, ParseException {
@@ -126,7 +159,6 @@ public final class Application {
                                          .collect(Collectors.toList());
 
         for (final Path path : collect) {
-
             result.add(Util.parseLts(path));
         }
 
