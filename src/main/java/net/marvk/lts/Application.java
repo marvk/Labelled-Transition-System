@@ -31,9 +31,9 @@ public final class Application {
             "SHOW UNREACHABLE STATES\n" +
             "\t-u\n" +
             "\tIf set, renders unreachable states\n" +
-            "CHECK CTL FORMULA(S)\n" +
+            "CHECK CTL FORMULA\n" +
             "\t-ctl\n" +
-            "\tIf set, checks the CTL formula(s)\n" +
+            "\tIf set, checks the CTL formula\n" +
             "ENGINE\n" +
             "\t-e [CIRCO|DOT|NEATO|OSAGE|TWOPI|FDP]\n" +
             "\tSet the Graphviz rendering engine\n" +

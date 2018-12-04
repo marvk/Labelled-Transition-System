@@ -19,6 +19,9 @@ This application can parse a simple custom description language for labeled tran
     SHOW UNREACHABLE STATES
         -u
         If set, renders unreachable states
+    CHECK CTL FORMULA
+        -ctl
+        If set, checks the CTL formula for all LTSs
     ENGINE
         -e [CIRCO|DOT|NEATO|OSAGE|TWOPI|FDP]
         Set the Graphviz rendering engine
@@ -28,7 +31,7 @@ This application can parse a simple custom description language for labeled tran
 
 ##Example
 
-    java -jar lts.jar -c compo -a -o results -f switch.lts lamp.lts
+    java -jar lts.jar -c compo -ctl lightOn -a -o results -f switch.lts lamp.lts
     
 This will produce the following images from their respective .lts files and composite respectively:
 
