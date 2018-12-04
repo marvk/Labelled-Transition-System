@@ -58,9 +58,10 @@ public final class Application {
         boolean outputAll = false;
         boolean createComposite = false;
         boolean showUnreachables = false;
+        boolean checkCTL = false;
         Path output = Paths.get("");
         String compositeName = null;
-        List<CTL> ctls = null;
+        String ctl = null;
 
         for (int i = 0; i < args.length; i++) {
             final String arg = args[i];
@@ -86,8 +87,12 @@ public final class Application {
                     }
                     break;
                 case "-ctl":
-                    ctls = getCtls(args, i);
-                    i = args.length;
+                    checkCTL = true;
+                    final String ctlstring = args[i + 1];
+                    if (!ctlstring.startsWith("-")){
+                        i++;
+                        ctl = ctlstring;
+                    }
                     break;
                 case "-u":
                     showUnreachables = true;
@@ -128,29 +133,30 @@ public final class Application {
             }
         }
 
-        if (ctls != null){
+        if (checkCTL){
+            CTL ctlFormula = new CTL(ctl);
+            System.out.println("CTL CHECK\n");
             String outputCTLCheck = "";
-            for (final CTL ctl: ctls){
-                outputCTLCheck += "CTL Formula " + ctl.getFormula() + " is for the LTS(s) named:\n";
-                for (final LabeledTransitionSystem lt: lts){
-                    outputCTLCheck += "\t-" + lt.getName() + " " + (ctl.check(lt) ? "TRUE" : "FALSE");
-                }
+            outputCTLCheck += "CTL Formula " + ctlFormula.getFormula() + " is for the LTS(s) named:\n";
+            for (final LabeledTransitionSystem lt: lts){
+                outputCTLCheck += "\t-" + lt.getName() + " " + (ctlFormula.check(lt) ? "TRUE" : "FALSE");
             }
             System.out.println(outputCTLCheck);
         }
 
     }
-
-    private static List<CTL> getCtls(String[] args, int i) throws IOException, ParseException {
+/*
+    private static List<CTL> getCtls(String[] args, int i) {
         final List<CTL> result = new ArrayList<>();
         final List<String> collect = Arrays.stream(Arrays.copyOfRange(args, i + 1, args.length)).collect(Collectors.toList());
 
         for (final String s : collect){
+            System.out.println(s);
             result.add(new CTL(s));
         }
         return result;
     }
-
+*/
     private static List<LabeledTransitionSystem> getLts(final String[] args, final int i) throws IOException, ParseException {
         final List<LabeledTransitionSystem> result = new ArrayList<>();
 
