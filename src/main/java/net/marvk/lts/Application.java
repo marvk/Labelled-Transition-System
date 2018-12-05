@@ -2,16 +2,18 @@ package net.marvk.lts;
 
 import guru.nidi.graphviz.engine.Engine;
 import net.marvk.lts.compiler.parser.ParseException;
+import net.marvk.lts.model.AtomicProposition;
 import net.marvk.lts.model.LabeledTransitionSystem;
+import net.marvk.lts.model.State;
 import net.marvk.lts.model.ctl.CTL;
 import net.marvk.lts.util.Util;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public final class Application {
@@ -63,7 +65,7 @@ public final class Application {
         boolean showUnreachables = false;
         boolean checkCTL = false;
         Path output = Paths.get("");
-        Path aps = Paths.get("");
+        String aps = null;
         String compositeName = null;
         String ctl = null;
 
@@ -92,8 +94,8 @@ public final class Application {
                     break;
                 case "-ap":
                     i++;
-                    aps = Paths.get(args[i]);
-                    System.out.println("APs path is " + aps.toString());
+                    aps = args[i];
+                    //System.out.println("APs path is " + aps.toString());
                     break;
                 case "-ctl":
                     checkCTL = true;
@@ -142,6 +144,41 @@ public final class Application {
             }
         }
 
+        if (aps != null){
+            //Add APs to LTS
+            List<String> lines = new ArrayList<>();
+            HashMap<State, Set<AtomicProposition>> labelingAP = new HashMap<>();
+            Set<AtomicProposition> allAPs = new HashSet<>();
+            String line = "";
+            String ltsName = "";
+            try(BufferedReader br = new BufferedReader(new FileReader(aps.toString()))){
+                while ((line = br.readLine()) != null){
+                    String[] l = line.split(",");
+                    if (l[0].equals("LTS name")){
+                        ltsName = l[1];
+                    }else{
+                        State key = new State(l[0]);
+                        Set<AtomicProposition> atomicPropositions = new HashSet<>();
+                        for (int i = 1; i < l.length; i++){
+                            atomicPropositions.add(new AtomicProposition(l[i]));
+                            if (!allAPs.contains(new AtomicProposition(l[i]))){
+                                //???????????????
+                            }
+                        }
+                        labelingAP.put(key, atomicPropositions);
+                    }
+                }
+            }catch(IOException e){
+                e.printStackTrace();
+            }
+            for (final LabeledTransitionSystem lt: lts){
+                if (lt.getName().equals(ltsName)){
+                    lt.setLabelingAP(labelingAP);
+                }
+            }
+
+        }
+
         if (checkCTL){
             CTL ctlFormula = new CTL(ctl);
             System.out.println("CTL CHECK\n");
@@ -154,18 +191,7 @@ public final class Application {
         }
 
     }
-/*
-    private static List<CTL> getCtls(String[] args, int i) {
-        final List<CTL> result = new ArrayList<>();
-        final List<String> collect = Arrays.stream(Arrays.copyOfRange(args, i + 1, args.length)).collect(Collectors.toList());
 
-        for (final String s : collect){
-            System.out.println(s);
-            result.add(new CTL(s));
-        }
-        return result;
-    }
-*/
     private static List<LabeledTransitionSystem> getLts(final String[] args, final int i) throws IOException, ParseException {
         final List<LabeledTransitionSystem> result = new ArrayList<>();
 

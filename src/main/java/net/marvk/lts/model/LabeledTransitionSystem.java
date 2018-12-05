@@ -231,6 +231,10 @@ public class LabeledTransitionSystem {
         return atomicPropositions;
     }
 
+    public void setAtomicPropositions(Set<AtomicProposition> aps){
+        this.atomicPropositions = aps;
+    }
+
     public Set<KSTransition> getKSTransitions(){
         HashSet<KSTransition> newKSTransitions = new HashSet<>();
         for (final Transition ltsTransition : this.transitions) {
@@ -240,6 +244,10 @@ public class LabeledTransitionSystem {
     }
     public HashMap<State, Set<AtomicProposition>> getLabelingAP() {
         return labelingAP;
+    }
+
+    public void setLabelingAP(HashMap<State, Set<AtomicProposition>> labelingAP) {
+        this.labelingAP = labelingAP;
     }
 
     public Set<Transition> getTransitions() {
