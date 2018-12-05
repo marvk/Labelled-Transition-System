@@ -90,19 +90,28 @@ Each line contains the name of the LTS to be checked and the CTL Formula (separa
     
 Example(CTLFormulasToCheck.csv):
 
-    lamp,lightOn
-    lamp,lightOn∨highBattUse
     lamp,lightOn∨E[EX lightOn U lightOn]
     lamp,EG lightOn
+    lamp,EG ¬highBattUse
     lamp,EX lightOn
     lamp,EX ¬lightOn
     lamp,EX highBattUse
     lamp,EX ¬highBattUse
+    lamp,E[1 U lightOn]
+    lamp,¬E[1 U ¬E[1 U ¬lightOn]]
+    lamp,¬E[1 U EG ¬highBattUse]
+    lamp,E[1 U ¬highBattUse]
     lamp,lightOn∨EX highBattUse
     lamp,E[lightOn U ¬highBattUse]
     compo,lightOn
     compo,lightOn∨highBattUse
     compo,EX ¬lightOn
+    compo,EG ¬highBattUse
+    compo,E[1 U lightOn]
+    compo,¬E[1 U ¬E[1 U ¬lightOn]]
+    compo,¬E[1 U EG ¬highBattUse]
+    compo,E[1 U ¬highBattUse]
+
 
 ##Grammar
 
