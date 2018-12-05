@@ -19,6 +19,9 @@ This application can parse a simple custom description language for labeled tran
     SHOW UNREACHABLE STATES
         -u
         If set, renders unreachable states
+    ADD ATOMIC PROPOSITIONS
+            -ap
+            Specify a csv file to add atomic propositions to a lts
     CHECK CTL FORMULA
         -ctl
         If set, checks the CTL formula for all LTSs

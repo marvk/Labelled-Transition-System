@@ -31,6 +31,9 @@ public final class Application {
             "SHOW UNREACHABLE STATES\n" +
             "\t-u\n" +
             "\tIf set, renders unreachable states\n" +
+            "ADD ATOMIC PROPOSITIONS\n" +
+            "\t-ap\n" +
+            "\tSpecify a csv file to add atomic propositions to a lts\n" +
             "CHECK CTL FORMULA\n" +
             "\t-ctl\n" +
             "\tIf set, checks the CTL formula\n" +
@@ -60,6 +63,7 @@ public final class Application {
         boolean showUnreachables = false;
         boolean checkCTL = false;
         Path output = Paths.get("");
+        Path aps = Paths.get("");
         String compositeName = null;
         String ctl = null;
 
@@ -85,6 +89,11 @@ public final class Application {
                         i++;
                         compositeName = maybeName;
                     }
+                    break;
+                case "-ap":
+                    i++;
+                    aps = Paths.get(args[i]);
+                    System.out.println("APs path is " + aps.toString());
                     break;
                 case "-ctl":
                     checkCTL = true;
