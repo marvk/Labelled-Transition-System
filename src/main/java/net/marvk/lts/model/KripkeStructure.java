@@ -39,10 +39,12 @@ public class KripkeStructure {
         this.initialStates = Set.copyOf(initialStates);
 
         Set<KSTransition> transitions = Set.copyOf(transitionRelation);
-        if (checkLeftTotality(transitions)){
+        boolean isLeftTotal = checkLeftTotality(transitions);
+        if (isLeftTotal) {
             this.transitionRelation = Set.copyOf(transitionRelation);
-        }else
-            this.transitionRelation = null;
+        } else {
+            this.transitionRelation = Collections.emptySet();
+        }
 
 /*
         for (final State s : this.states) {
@@ -91,7 +93,7 @@ public class KripkeStructure {
         }
     }
 
-    public KripkeStructure(LabeledTransitionSystem lts){
+    public KripkeStructure(LabeledTransitionSystem lts) {
         this(lts.getName(), lts.getStates(), lts.getInitialStates(), lts.getKSTransitions(), lts.getLabelingAP());
     }
 
@@ -128,21 +130,25 @@ public class KripkeStructure {
      * Checks if the Transition relation is left-total.
      */
     public boolean checkLeftTotality(final Set<KSTransition> ksTransition) {
-        boolean hasOutRelation = false;
+        System.out.println(ksTransition);
+        System.out.println(states);
         for (final State s : this.states) {
-            for (KSTransition t : ksTransition) {
-                if (t.getStartState() == s) {
-                    hasOutRelation = true;
-                }
-            }
-            if (!hasOutRelation) {
+            if (!hasOutgoingTransition(ksTransition, s)) {
                 System.out.println("There is no transition from " + s +
                         " to another state from States.\nThis transition relation IS NOT left-total!");
                 return false;
             }
-
         }
-        return hasOutRelation;
+        return true;
+    }
+
+    private static boolean hasOutgoingTransition(Set<KSTransition> ksTransition, State s) {
+        for (KSTransition t : ksTransition) {
+            if (t.getStartState().equals(s)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static String defaultName() {

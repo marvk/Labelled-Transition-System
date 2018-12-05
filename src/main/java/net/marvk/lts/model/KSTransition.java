@@ -21,8 +21,11 @@ public class KSTransition {
     }
 
     @Override
-    public String toString(){
-        return "(" + startState + ", " + goalState + ")";
+    public String toString() {
+        return "KSTransition{" +
+                "startState=" + startState +
+                ", goalState=" + goalState +
+                '}';
     }
 
     @Override

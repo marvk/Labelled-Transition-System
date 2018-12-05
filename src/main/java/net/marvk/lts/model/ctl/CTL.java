@@ -32,7 +32,6 @@ public class CTL {
     }
 
     public boolean check(LabeledTransitionSystem lts) {
-
         final KripkeStructure ks = new KripkeStructure(lts);
 
         boolean result = true;
@@ -119,7 +118,9 @@ public class CTL {
     private Collection<State> getAllPredecessorStates(State state, KripkeStructure ks) {
         Collection<State> result = new HashSet<>();
 
-        for (KSTransition t : ks.getTransitionRelation()) {
+        Set<KSTransition> transitionRelation = ks.getTransitionRelation();
+
+        for (KSTransition t : transitionRelation) {
             if (t.getGoalState().equals(state)) {
                 result.add(t.getStartState());
             }

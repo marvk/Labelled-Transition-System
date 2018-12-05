@@ -173,6 +173,8 @@ public final class Application {
                     lt.setAtomicPropositions(allAPs);
                     lt.setLabelingAP(labelingAP);
                 }
+                System.out.println(lt.toString());
+                //System.out.println(lt.getAtomicPropositions().toString());
             }
 
         }
