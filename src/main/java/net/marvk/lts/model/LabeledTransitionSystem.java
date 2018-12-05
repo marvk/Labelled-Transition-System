@@ -310,7 +310,7 @@ public class LabeledTransitionSystem {
 
         if (this.atomicPropositions != null && !this.atomicPropositions.isEmpty()
                 && other.atomicPropositions != null && !other.atomicPropositions.isEmpty()) {
-            final Set<AtomicProposition> atomicPropositions = Set.copyOf(this.atomicPropositions);
+            Set<AtomicProposition> atomicPropositions = new HashSet<>(this.atomicPropositions);
             atomicPropositions.addAll(other.atomicPropositions);
 
             final HashMap<State, Set<AtomicProposition>> labelingAP = new HashMap<>();
@@ -320,7 +320,7 @@ public class LabeledTransitionSystem {
              */
             for (final State stateLTS1 : this.labelingAP.keySet()) {
                 for (final State stateLTS2 : other.labelingAP.keySet()) {
-                    Set<AtomicProposition> tempAPs = Set.copyOf(this.labelingAP.get(stateLTS1));
+                    Set<AtomicProposition> tempAPs = new HashSet<>(this.labelingAP.get(stateLTS1));
                     tempAPs.addAll(other.labelingAP.get(stateLTS2));
                     labelingAP.put(new CompositeState(stateLTS1, stateLTS2), tempAPs);
                 }
