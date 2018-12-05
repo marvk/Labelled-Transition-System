@@ -68,6 +68,8 @@ public final class Application {
         String aps = null;
         String compositeName = null;
         String ctl = null;
+        String ltsToCheck = null;
+        HashMap<LabeledTransitionSystem, Set<CTL>> ctlFormulaChecks = new HashMap<>();
 
         for (int i = 0; i < args.length; i++) {
             final String arg = args[i];
@@ -99,11 +101,8 @@ public final class Application {
                     break;
                 case "-ctl":
                     checkCTL = true;
-                    final String ctlstring = args[i + 1];
-                    if (!ctlstring.startsWith("-")){
-                        i++;
-                        ctl = ctlstring;
-                    }
+                    i++;
+                    ctl = args[i];
                     break;
                 case "-u":
                     showUnreachables = true;
@@ -146,24 +145,22 @@ public final class Application {
 
         if (aps != null){
             //Add APs to LTS
-            List<String> lines = new ArrayList<>();
             HashMap<State, Set<AtomicProposition>> labelingAP = new HashMap<>();
             Set<AtomicProposition> allAPs = new HashSet<>();
-            String line = "";
-            String ltsName = "";
-            try(BufferedReader br = new BufferedReader(new FileReader(aps.toString()))){
+            String line;
+            try(BufferedReader br = new BufferedReader(new FileReader(aps))){
                 while ((line = br.readLine()) != null){
                     String[] l = line.split(",");
+                    //System.out.println(line);
                     if (l[0].equals("LTS name")){
-                        ltsName = l[1];
+                        ltsToCheck = l[1];
                     }else{
                         State key = new State(l[0]);
                         Set<AtomicProposition> atomicPropositions = new HashSet<>();
                         for (int i = 1; i < l.length; i++){
-                            atomicPropositions.add(new AtomicProposition(l[i]));
-                            if (!allAPs.contains(new AtomicProposition(l[i]))){
-                                //???????????????
-                            }
+                            AtomicProposition atomicProposition = new AtomicProposition(l[i]);
+                            atomicPropositions.add(atomicProposition);
+                            allAPs.add(atomicProposition);
                         }
                         labelingAP.put(key, atomicPropositions);
                     }
@@ -172,7 +169,8 @@ public final class Application {
                 e.printStackTrace();
             }
             for (final LabeledTransitionSystem lt: lts){
-                if (lt.getName().equals(ltsName)){
+                if (lt.getName().equals(ltsToCheck)){
+                    lt.setAtomicPropositions(allAPs);
                     lt.setLabelingAP(labelingAP);
                 }
             }
@@ -180,12 +178,35 @@ public final class Application {
         }
 
         if (checkCTL){
-            CTL ctlFormula = new CTL(ctl);
-            System.out.println("CTL CHECK\n");
-            String outputCTLCheck = "";
-            outputCTLCheck += "CTL Formula " + ctlFormula.getFormula() + " is for the LTS(s) named:\n";
+            HashMap<String, Set<CTL>> ctlsToCheck = new HashMap<>();
+            String line;
+            try(BufferedReader bufferedReader = new BufferedReader(new FileReader(ctl))){
+                while((line = bufferedReader.readLine()) != null){
+                    String[] l = line.split(",");
+                    if (!ctlsToCheck.containsKey(l[0])){
+                        ctlsToCheck.put(l[0], new HashSet<>());
+                    }
+                    ctlsToCheck.get(l[0]).add(new CTL(l[1]));
+                }
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+
             for (final LabeledTransitionSystem lt: lts){
-                outputCTLCheck += "\t-" + lt.getName() + " " + (ctlFormula.check(lt) ? "TRUE" : "FALSE");
+                Set<CTL> values = new HashSet<>();
+                if (ctlsToCheck.containsKey(lt.getName())){
+                    ctlFormulaChecks.put(lt, ctlsToCheck.get(lt.getName()));
+                }
+            }
+
+            System.out.println("\nCTL CHECK\n");
+            String outputCTLCheck = "";
+            for (Map.Entry<LabeledTransitionSystem, Set<CTL>> entry: ctlFormulaChecks.entrySet()){
+                outputCTLCheck += "For the LTS named " + entry.getKey().getName() + ":";
+                for (CTL c: entry.getValue()){
+                    outputCTLCheck += "\n\t-CTL Formula " + c.getFormula() + " is " +
+                            (c.check(entry.getKey()) ? "TRUE" : "FALSE");
+                }
             }
             System.out.println(outputCTLCheck);
         }

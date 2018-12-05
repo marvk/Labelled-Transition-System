@@ -33,14 +33,18 @@ public class KripkeStructure {
      * @param initialStates
      * @param transitionRelation
      */
-
-
     public KripkeStructure(final String name, final Collection<State> states, final Collection<State> initialStates, final Collection<KSTransition> transitionRelation, final HashMap<State, Set<AtomicProposition>> labelingFunction) {
         this.name = name == null || name.isEmpty() ? defaultName() : name;
         this.states = Objects.requireNonNull(Set.copyOf(states));
         this.initialStates = Set.copyOf(initialStates);
-        this.transitionRelation = Set.copyOf(transitionRelation);
 
+        Set<KSTransition> transitions = Set.copyOf(transitionRelation);
+        if (checkLeftTotality(transitions)){
+            this.transitionRelation = Set.copyOf(transitionRelation);
+        }else
+            this.transitionRelation = null;
+
+/*
         for (final State s : this.states) {
             boolean hasOutRelation = false;
             for (KSTransition t : transitionRelation) {
@@ -50,12 +54,14 @@ public class KripkeStructure {
                 }
             }
             if (!hasOutRelation) {
-                throw new IllegalArgumentException("There exists no outgoing transition " +
+                //throw new IllegalArgumentException("There exists no outgoing transition " +
+                //        "for State " + s.toString() + "! This relation IS NOT left-total.");
+                System.out.println("WARNING: There exists no outgoing transition " +
                         "for State " + s.toString() + "! This relation IS NOT left-total.");
             }
 
         }
-
+*/
         for (final State initialState : this.initialStates) {
             if (!states.contains(initialState)) {
                 throw new IllegalArgumentException("Initial State " + initialState + " not in set of states");
@@ -74,8 +80,12 @@ public class KripkeStructure {
         }
         this.labelingFunction = Objects.requireNonNull(labelingFunction);
         for (final State s : this.states) {
+            //System.out.println(labelingFunction.get(s));
             if (!labelingFunction.containsKey(s)) {
-                throw new IllegalArgumentException("There is no entry for state " + s);
+                //throw new IllegalArgumentException("There is no entry for state " + s);
+                //System.out.println("WARNING: There is no entry for state " + s);
+                Set<AtomicProposition> ap = new HashSet<>();
+                labelingFunction.put(s, ap);
             }
 
         }
@@ -118,12 +128,11 @@ public class KripkeStructure {
      * Checks if the Transition relation is left-total.
      */
     public boolean checkLeftTotality(final Set<KSTransition> ksTransition) {
+        boolean hasOutRelation = false;
         for (final State s : this.states) {
-            boolean hasOutRelation = false;
             for (KSTransition t : ksTransition) {
                 if (t.getStartState() == s) {
                     hasOutRelation = true;
-                    break;
                 }
             }
             if (!hasOutRelation) {
@@ -133,7 +142,7 @@ public class KripkeStructure {
             }
 
         }
-        return true;
+        return hasOutRelation;
     }
 
     private static String defaultName() {

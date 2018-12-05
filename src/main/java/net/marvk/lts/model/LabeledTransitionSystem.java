@@ -236,7 +236,7 @@ public class LabeledTransitionSystem {
     }
 
     public Set<KSTransition> getKSTransitions(){
-        HashSet<KSTransition> newKSTransitions = new HashSet<>();
+        Set<KSTransition> newKSTransitions = new HashSet<>();
         for (final Transition ltsTransition : this.transitions) {
             newKSTransitions.add(new KSTransition(ltsTransition.getStartState(), ltsTransition.getGoalState()));
         }
