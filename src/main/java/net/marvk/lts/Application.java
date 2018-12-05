@@ -123,45 +123,32 @@ public final class Application {
             System.err.println("Error: No input specified");
             return;
         }
-        LabeledTransitionSystem composite = null;
-        if (createComposite) {
-            if (lts.size() <= 1) {
-                System.err.println("Warning: Only one lts specified, ignoring composite instruction");
-            }
-
-            composite = lts.get(0).parallelComposition(compositeName, showUnreachables, lts.subList(1, lts
-                                                                 .size()));
-
-            Util.renderLts(composite, output, engine);
-        }
-
-        if (lts.size() == 1 || outputAll) {
-            for (final LabeledTransitionSystem lt : lts) {
-                Util.renderLts(lt, output, engine);
-            }
-        }
 
         allLTSs.addAll(lts);
-        allLTSs.add(composite);
 
         if (aps != null){
             //Add APs to LTS
             HashMap<State, Set<AtomicProposition>> labelingAP = new HashMap<>();
             Set<AtomicProposition> allAPs = new HashSet<>();
             String line;
+            String currentAPName = null;
             try(BufferedReader br = new BufferedReader(new FileReader(aps))){
                 while ((line = br.readLine()) != null){
                     String[] l = line.split(",");
+
                     //System.out.println(line);
                     if(l.length == 1){
-                        for (final LabeledTransitionSystem lt : allLTSs) {
-                            if (lt.getName().equals(l[0])) {
-                                lt.setAtomicPropositions(allAPs);
-                                lt.setLabelingAP(labelingAP);
+                        if (currentAPName!=null){
+                            for (LabeledTransitionSystem lt : allLTSs) {
+                                if (lt.getName().equals(currentAPName)) {
+                                    lt.setAtomicPropositions(allAPs);
+                                    lt.setLabelingAP(labelingAP);
+                                }
                             }
                         }
                         allAPs = new HashSet<>();
                         labelingAP = new HashMap<>();
+                        currentAPName = l[0];
                     }else{
                         State key = new State(l[0]);
                         Set<AtomicProposition> atomicPropositions = new HashSet<>();
@@ -173,10 +160,39 @@ public final class Application {
                         labelingAP.put(key, atomicPropositions);
                     }
                 }
+
+                for (LabeledTransitionSystem lt : allLTSs) {
+                    if (lt.getName().equals(currentAPName)) {
+                        lt.setAtomicPropositions(allAPs);
+                        lt.setLabelingAP(labelingAP);
+                    }
+                }
             }catch(IOException e){
                 e.printStackTrace();
             }
         }
+
+        LabeledTransitionSystem composite = null;
+        if (createComposite) {
+            if (lts.size() <= 1) {
+                System.err.println("Warning: Only one lts specified, ignoring composite instruction");
+            }
+
+            composite = lts.get(0).parallelComposition(compositeName, showUnreachables, lts.subList(1, lts
+                    .size()));
+//            System.out.print(composite.getLabelingAP());
+
+            Util.renderLts(composite, output, engine);
+        }
+
+        if (lts.size() == 1 || outputAll) {
+            for (final LabeledTransitionSystem lt : lts) {
+                Util.renderLts(lt, output, engine);
+            }
+        }
+
+
+        allLTSs.add(composite);
 
         if (checkCTL){
             HashMap<String, Set<CTL>> ctlsToCheck = new HashMap<>();
