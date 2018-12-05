@@ -1,7 +1,5 @@
 lamp
 low,lightOn
 high,lightOn,highBattUse
-compo
-low+pr,lightOn
-low+rel,lightOn
-high+rel,lightOn,highBattUse
+switch
+pr,lightOn
