@@ -21,10 +21,10 @@ This application can parse a simple custom description language for labeled tran
         If set, renders unreachable states
     ADD ATOMIC PROPOSITIONS
             -ap
-            Specify a csv file to add atomic propositions to a lts
+            Specify a csv file to add atomic propositions to lts(es)
     CHECK CTL FORMULA
         -ctl
-        If set, checks the CTL formula for all LTSs
+        If set, checks the CTL formula(s) for a given lts name
     ENGINE
         -e [CIRCO|DOT|NEATO|OSAGE|TWOPI|FDP]
         Set the Graphviz rendering engine
@@ -34,7 +34,7 @@ This application can parse a simple custom description language for labeled tran
 
 ##Example
 
-    java -jar lts.jar -c compo -ctl lightOn -a -o results -f switch.lts lamp.lts
+    java -jar lts.jar -c compo -ctl CTLFormulas.csv -ap aps.csv -a -o results -f switch.lts lamp.lts
     
 This will produce the following images from their respective .lts files and composite respectively:
 
@@ -62,6 +62,19 @@ This will produce the following images from their respective .lts files and comp
 #### Composite (Switch||Lamp)
 
 ![composite_graph](https://i.imgur.com/tPHVkG1.png) 
+
+#### CTLFormulas.csv (Example)
+    
+    lamp,lightOn
+    lamp,lightOnvhighBattUse
+    lamp,lightOn∨E[EX lightOn U lightOn]
+
+#### aps.csv (Example)
+At this point, only one file for only one LTS is supported.
+
+    LTS name,lamp
+    low,lightOn
+    high,lightOn,highBattUse
 
 ##Grammar
 

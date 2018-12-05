@@ -35,10 +35,10 @@ public final class Application {
             "\tIf set, renders unreachable states\n" +
             "ADD ATOMIC PROPOSITIONS\n" +
             "\t-ap\n" +
-            "\tSpecify a csv file to add atomic propositions to a lts\n" +
-            "CHECK CTL FORMULA\n" +
+            "\tSpecify a csv file to add atomic propositions to lts(es)\n" +
+            "CHECK CTL FORMULA(S)\n" +
             "\t-ctl\n" +
-            "\tIf set, checks the CTL formula\n" +
+            "\tIf set, checks the CTL formula(s) for the given lts name\n" +
             "ENGINE\n" +
             "\t-e [CIRCO|DOT|NEATO|OSAGE|TWOPI|FDP]\n" +
             "\tSet the Graphviz rendering engine\n" +
@@ -46,7 +46,7 @@ public final class Application {
             "\t-o file\n" +
             "\tSet the output folder\n\n" +
             "Example:\n" +
-            "\tjava -jar lts.jar -c comp -a -o results -f switch.lts lamp.lts";
+            "\tjava -jar lts.jar -c comp -ctl CTLFormulas.csv -ap aps.csv -a -o results -f switch.lts lamp.lts";
 
     private Application() {
         throw new AssertionError("No instances of class " + Application.class);
