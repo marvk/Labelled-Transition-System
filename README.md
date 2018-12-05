@@ -20,9 +20,9 @@ This application can parse a simple custom description language for labeled tran
         -u
         If set, renders unreachable states
     ADD ATOMIC PROPOSITIONS
-            -ap
-            Specify a csv file to add atomic propositions to lts(es)
-    CHECK CTL FORMULA
+        -ap
+        Specify a csv file to add atomic propositions to lts(es)
+    CHECK CTL FORMULA(S)
         -ctl
         If set, checks the CTL formula(s) for a given lts name
     ENGINE
@@ -63,18 +63,46 @@ This will produce the following images from their respective .lts files and comp
 
 ![composite_graph](https://i.imgur.com/tPHVkG1.png) 
 
-#### CTLFormulas.csv (Example)
+
+#### Adding Atomic Propositions
+At first, state the name of the LTS where Atomic Propositions should be added to. Then, for each state in a new line,
+give it's representation and the set of atomic propositions separated by ','.
+
+    LTSname
+    state1Representation,ap1
+    state2Representation,ap1,ap2,ap3
     
-    lamp,lightOn
-    lamp,lightOnvhighBattUse
-    lamp,lightOn∨E[EX lightOn U lightOn]
+Example (aps.csv):
 
-#### aps.csv (Example)
-At this point, only one file for only one LTS is supported.
-
-    LTS name,lamp
+    lamp
     low,lightOn
     high,lightOn,highBattUse
+    compo
+    low+pr,lightOn
+    low+rel,lightOn
+    high+rel,lightOn,highBattUse
+
+
+#### CTL Formulas
+Each line contains the name of the LTS to be checked and the CTL Formula (separated by ',').
+
+    LTSName,formula1
+    
+Example(CTLFormula.csv):
+
+    lamp,lightOn
+    lamp,lightOn∨highBattUse
+    lamp,lightOn∨E[EX lightOn U lightOn]
+    lamp,EG lightOn
+    lamp,EX lightOn
+    lamp,EX ¬lightOn
+    lamp,EX highBattUse
+    lamp,EX ¬highBattUse
+    lamp,lightOn∨EX highBattUse
+    lamp,E[lightOn U ¬highBattUse]
+    compo,lightOn
+    compo,lightOn∨highBattUse
+    compo,EX ¬lightOn
 
 ##Grammar
 
