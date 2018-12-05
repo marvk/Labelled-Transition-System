@@ -1,3 +1,11 @@
 lamp,lightOn
-lamp,lightOnvhighBattUse
+lamp,lightOn∨highBattUse
 lamp,lightOn∨E[EX lightOn U lightOn]
+lamp,EG lightOn
+lamp,EX lightOn
+lamp,EX ¬lightOn
+lamp,EX highBattUse
+lamp,EX ¬highBattUse
+lamp,lightOn∨EX highBattUse
+lamp,E[lightOn U ¬highBattUse]
+compo,lightOn

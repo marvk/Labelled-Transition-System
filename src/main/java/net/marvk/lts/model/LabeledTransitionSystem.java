@@ -489,7 +489,7 @@ public class LabeledTransitionSystem {
                                 state -> Factory.mutNode(state.getRepresentation())
                                         .add(Color.BLACK, Shape.CIRCLE, Label.of(state.getRepresentation())))
                         );
-
+        //+ (labelingAP.isEmpty() ? "" : "w/ AP(s) " + labelingAP.get(state))
         //Make all initial States Red
         initialStates.forEach(state -> stateMutableNodeMap.get(state).add(Color.RED));
 

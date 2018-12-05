@@ -69,7 +69,8 @@ public final class Application {
         String compositeName = null;
         String ctl = null;
         String ltsToCheck = null;
-        HashMap<LabeledTransitionSystem, Set<CTL>> ctlFormulaChecks = new HashMap<>();
+        HashMap<LabeledTransitionSystem, Set<CTL>> ctlFormulaChecks;
+        List<LabeledTransitionSystem> allLTSs = new ArrayList<>();
 
         for (int i = 0; i < args.length; i++) {
             final String arg = args[i];
@@ -124,14 +125,13 @@ public final class Application {
             System.err.println("Error: No input specified");
             return;
         }
-
+        LabeledTransitionSystem composite = null;
         if (createComposite) {
             if (lts.size() <= 1) {
                 System.err.println("Warning: Only one lts specified, ignoring composite instruction");
             }
 
-            final LabeledTransitionSystem composite = lts.get(0)
-                                                         .parallelComposition(compositeName, showUnreachables, lts.subList(1, lts
+            composite = lts.get(0).parallelComposition(compositeName, showUnreachables, lts.subList(1, lts
                                                                  .size()));
 
             Util.renderLts(composite, output, engine);
@@ -168,13 +168,16 @@ public final class Application {
             }catch(IOException e){
                 e.printStackTrace();
             }
-            for (final LabeledTransitionSystem lt: lts){
+
+            allLTSs.addAll(lts);
+            allLTSs.add(composite);
+
+            for (final LabeledTransitionSystem lt: allLTSs){
                 if (lt.getName().equals(ltsToCheck)){
                     lt.setAtomicPropositions(allAPs);
                     lt.setLabelingAP(labelingAP);
                 }
-                System.out.println(lt.toString());
-                //System.out.println(lt.getAtomicPropositions().toString());
+                //System.out.println(lt.toString());
             }
 
         }
@@ -194,21 +197,21 @@ public final class Application {
                 e.printStackTrace();
             }
 
-            for (final LabeledTransitionSystem lt: lts){
-                Set<CTL> values = new HashSet<>();
-                if (ctlsToCheck.containsKey(lt.getName())){
-                    ctlFormulaChecks.put(lt, ctlsToCheck.get(lt.getName()));
-                }
-            }
+            ctlFormulaChecks = allLTSs.stream().filter(lt -> ctlsToCheck.containsKey(lt.getName())).collect(Collectors.toMap(lt -> lt, lt -> ctlsToCheck.get(lt.getName()), (a, b) -> b, HashMap::new));
 
             System.out.println("\nCTL CHECK\n");
             String outputCTLCheck = "";
             for (Map.Entry<LabeledTransitionSystem, Set<CTL>> entry: ctlFormulaChecks.entrySet()){
-                outputCTLCheck += "For the LTS named " + entry.getKey().getName() + ":";
-                for (CTL c: entry.getValue()){
-                    outputCTLCheck += "\n\t-CTL Formula " + c.getFormula() + " is " +
-                            (c.check(entry.getKey()) ? "TRUE" : "FALSE");
+                if (entry.getKey().getLabelingAP() != null){
+                    outputCTLCheck += "For the LTS named *" + entry.getKey().getName() + "*:";
+                    for (CTL c: entry.getValue()){
+                        outputCTLCheck += "\n\t- " + c.getFormula() + " -> " +
+                                (c.check(entry.getKey()) ? "TRUE" : "FALSE");
+                    }
+                }else{
+                    outputCTLCheck += "For the LTS named *" + entry.getKey().getName() + "* exists no labeling function.\n\n";
                 }
+
             }
             System.out.println(outputCTLCheck);
         }

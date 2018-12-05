@@ -46,24 +46,6 @@ public class KripkeStructure {
             this.transitionRelation = Collections.emptySet();
         }
 
-/*
-        for (final State s : this.states) {
-            boolean hasOutRelation = false;
-            for (KSTransition t : transitionRelation) {
-                if (t.getStartState() == s) {
-                    hasOutRelation = true;
-                    break;
-                }
-            }
-            if (!hasOutRelation) {
-                //throw new IllegalArgumentException("There exists no outgoing transition " +
-                //        "for State " + s.toString() + "! This relation IS NOT left-total.");
-                System.out.println("WARNING: There exists no outgoing transition " +
-                        "for State " + s.toString() + "! This relation IS NOT left-total.");
-            }
-
-        }
-*/
         for (final State initialState : this.initialStates) {
             if (!states.contains(initialState)) {
                 throw new IllegalArgumentException("Initial State " + initialState + " not in set of states");
@@ -82,7 +64,6 @@ public class KripkeStructure {
         }
         this.labelingFunction = Objects.requireNonNull(labelingFunction);
         for (final State s : this.states) {
-            //System.out.println(labelingFunction.get(s));
             if (!labelingFunction.containsKey(s)) {
                 //throw new IllegalArgumentException("There is no entry for state " + s);
                 //System.out.println("WARNING: There is no entry for state " + s);
@@ -130,8 +111,6 @@ public class KripkeStructure {
      * Checks if the Transition relation is left-total.
      */
     public boolean checkLeftTotality(final Set<KSTransition> ksTransition) {
-        System.out.println(ksTransition);
-        System.out.println(states);
         for (final State s : this.states) {
             if (!hasOutgoingTransition(ksTransition, s)) {
                 System.out.println("There is no transition from " + s +
@@ -156,12 +135,3 @@ public class KripkeStructure {
                 .toEpochSecond(ZoneOffset.UTC);
     }
 }
-
-
-/*
- *
- * S = EX(exp) | EG(exp) | EU(exp) | S | !S | exp
- * exp = exp or exp | exp und exp | !exp | AP | true | false
- * AP
- *
- * */
