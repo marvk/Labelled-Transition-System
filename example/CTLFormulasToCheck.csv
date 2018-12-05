@@ -1,5 +1,3 @@
-lamp,lightOn
-lamp,lightOn∨highBattUse
 lamp,lightOn∨E[EX lightOn U lightOn]
 lamp,EG lightOn
 lamp,EG ¬highBattUse
@@ -16,4 +14,8 @@ lamp,E[lightOn U ¬highBattUse]
 compo,lightOn
 compo,lightOn∨highBattUse
 compo,EX ¬lightOn
-example1,E[1 U ¬E[1 U ¬q]]
+compo,EG ¬highBattUse
+compo,E[1 U lightOn]
+compo,¬E[1 U ¬E[1 U ¬lightOn]]
+compo,¬E[1 U EG ¬highBattUse]
+compo,E[1 U ¬highBattUse]

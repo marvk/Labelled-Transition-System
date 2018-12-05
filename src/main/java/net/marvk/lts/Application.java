@@ -68,8 +68,6 @@ public final class Application {
         String aps = null;
         String compositeName = null;
         String ctl = null;
-        //String ltsToCheck = null;
-        //List<String> ltsToAddAP = new ArrayList<>();
         HashMap<LabeledTransitionSystem, Set<CTL>> ctlFormulaChecks;
         List<LabeledTransitionSystem> allLTSs = new ArrayList<>();
 
@@ -99,7 +97,6 @@ public final class Application {
                 case "-ap":
                     i++;
                     aps = args[i];
-                    //System.out.println("APs path is " + aps.toString());
                     break;
                 case "-ctl":
                     checkCTL = true;
@@ -157,9 +154,6 @@ public final class Application {
                     String[] l = line.split(",");
                     //System.out.println(line);
                     if(l.length == 1){
-                    //if (l[0].equals("LTS name")){
-                        //ltsToCheck = l[0];
-                        //ltsToAddAP.add(l[0]);
                         for (final LabeledTransitionSystem lt : allLTSs) {
                             if (lt.getName().equals(l[0])) {
                                 lt.setAtomicPropositions(allAPs);
@@ -168,7 +162,6 @@ public final class Application {
                         }
                         allAPs = new HashSet<>();
                         labelingAP = new HashMap<>();
-
                     }else{
                         State key = new State(l[0]);
                         Set<AtomicProposition> atomicPropositions = new HashSet<>();
@@ -183,15 +176,6 @@ public final class Application {
             }catch(IOException e){
                 e.printStackTrace();
             }
-/*
-            for (final LabeledTransitionSystem lt: allLTSs){
-                if (lt.getName().equals(ltsToCheck)){
-                    lt.setAtomicPropositions(allAPs);
-                    lt.setLabelingAP(labelingAP);
-                }
-                //System.out.println(lt.toString());
-            }
-*/
         }
 
         if (checkCTL){

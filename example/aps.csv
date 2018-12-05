@@ -5,8 +5,3 @@ compo
 low+pr,lightOn
 low+rel,lightOn
 high+rel,lightOn,highBattUse
-example1
-s0,q
-s1,q,r
-s2,p
-s3,p,q
