@@ -9,3 +9,5 @@ lamp,EX ¬highBattUse
 lamp,lightOn∨EX highBattUse
 lamp,E[lightOn U ¬highBattUse]
 compo,lightOn
+compo,lightOn∨highBattUse
+compo,EX ¬lightOn
