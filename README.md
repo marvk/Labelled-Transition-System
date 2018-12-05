@@ -34,7 +34,7 @@ This application can parse a simple custom description language for labeled tran
 
 ##Example
 
-    java -jar lts.jar -c compo -ctl CTLFormulas.csv -ap aps.csv -a -o results -f switch.lts lamp.lts
+    java -jar lts.jar -c compo -ctl CTLFormulasToCheck.csv -ap aps.csv -a -o results -f switch.lts lamp.lts
     
 This will produce the following images from their respective .lts files and composite respectively:
 
@@ -88,7 +88,7 @@ Each line contains the name of the LTS to be checked and the CTL Formula (separa
 
     LTSName,formula1
     
-Example(CTLFormula.csv):
+Example(CTLFormulasToCheck.csv):
 
     lamp,lightOn
     lamp,lightOn∨highBattUse
