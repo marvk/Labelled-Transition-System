@@ -2,7 +2,7 @@
 
 This application can parse a simple custom description language for labeled transition systems, create composites (synchronize on identical transition symbols), and graph them using [graphviz-java](https://github.com/nidi3/graphviz-java).
 
-##Usage
+## Usage
 
     HELP
         -h
@@ -32,7 +32,7 @@ This application can parse a simple custom description language for labeled tran
         -o file
         Set the output folder
 
-##Example
+## Example
 
     java -jar lts.jar -c compo -ctl CTLFormulasToCheck.csv -ap aps.csv -a -o results -f switch.lts lamp.lts
     
