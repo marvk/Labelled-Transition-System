@@ -113,7 +113,7 @@ Example(CTLFormulasToCheck.csv):
     compo,E[1 U ¬highBattUse]
 
 
-##Grammar
+## Grammar
 
 The custom grammar is as follows
 
